@@ -1,29 +1,47 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ArrowUpRight, BriefcaseBusiness, Building2, Check, GraduationCap, MapPin, Search, Sparkles } from 'lucide-react'
+import { ArrowRight, Bell, BriefcaseBusiness, Building2, CalendarDays, Check, ChevronDown, GraduationCap, Heart, MapPin, Search, Sparkles, Users } from 'lucide-react'
 import './styles.css'
 
-const roles = { candidate: { label: 'Job seeker', icon: GraduationCap, eyebrow: 'Find work that fits your life', title: 'Your next chapter starts here.', copy: 'A calmer way to search, apply, and keep moving forward.', cta: 'Explore open roles' }, company: { label: 'Company', icon: Building2, eyebrow: 'Build your next great team', title: 'Meet people who move things forward.', copy: 'Share the work worth doing and find the people ready to do it.', cta: 'Post a role' } }
 const jobs = [
-  { title: 'Product Designer', company: 'Lumen Labs', location: 'San Francisco · Hybrid', type: 'Full-time', color: 'coral' },
-  { title: 'Frontend Engineer', company: 'Northstar Health', location: 'Remote · US only', type: 'Full-time', color: 'blue' },
-  { title: 'Community Lead', company: 'Goodfield', location: 'New York · On-site', type: 'Full-time', color: 'yellow' },
+  { id: 1, title: 'Product Design Intern', company: 'Northstar Health', location: 'Remote · United States', type: 'Internship', salary: '$28–32/hr', accent: 'blue', logo: 'N' },
+  { id: 2, title: 'Frontend Engineer', company: 'Lumen Labs', location: 'San Francisco, CA · Hybrid', type: 'Full-time', salary: '$110k–135k', accent: 'orange', logo: 'L' },
+  { id: 3, title: 'Research Assistant', company: 'Goodfield University', location: 'New York, NY · On-site', type: 'Part-time', salary: '$24–28/hr', accent: 'gold', logo: 'G' },
 ]
 
-function App() {
-  const [role, setRole] = useState('candidate')
-  const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const active = roles[role]
-  const Icon = active.icon
-  return <main className="shell">
-    <nav><div className="brand"><span className="brand-mark">↗</span> wayfinder</div><div className="nav-links"><a href="#roles">Browse roles</a><a href="#about">How it works</a><button className="nav-login">Sign in</button></div></nav>
-    <section className="hero"><div className="hero-copy"><div className="eyebrow"><Sparkles size={15}/> A better way to get hired</div><h1>Good work<br/><em>finds</em> good people.</h1><p className="lede">Wayfinder brings ambitious people and thoughtful companies together — with a little less noise in between.</p><div className="hero-actions"><button className="button button-dark" onClick={() => document.getElementById('roles').scrollIntoView({ behavior: 'smooth' })}>Start exploring <ArrowUpRight size={18}/></button><span className="quiet-note">No endless applications. Promise.</span></div></div><div className="hero-art"><div className="orbit orbit-one"></div><div className="orbit orbit-two"></div><div className="art-card"><span className="card-kicker">A note for today</span><strong>Make room for<br/><span>the right fit.</span></strong><div className="scribble">✳</div></div><div className="floating-tag tag-top">✦ 24,812 people hired</div><div className="floating-tag tag-bottom">→ human-first matching</div></div></section>
-    <section className="role-section" id="roles"><div className="section-intro"><span className="section-number">01 /</span><h2>Where are you<br/>headed?</h2></div><div className="role-grid">{Object.entries(roles).map(([key, item]) => { const RoleIcon = item.icon; return <button key={key} className={`role-card ${role === key ? 'selected' : ''}`} onClick={() => { setRole(key); setSubmitted(false) }}><div className="role-icon"><RoleIcon size={22}/></div><div><span className="role-label">I’m a {item.label.toLowerCase()}</span><h3>{item.cta}</h3><p>{key === 'candidate' ? 'Search roles with space to grow.' : 'Tell your story to the right candidates.'}</p></div><ArrowUpRight className="role-arrow" size={20}/></button> })}</div></section>
-    <section className="portal"><div className="portal-heading"><span className="section-number">02 / YOUR PORTAL</span><h2>{active.title}</h2><p>{active.copy}</p></div><div className="login-panel"><div className="panel-top"><div className="mini-icon"><Icon size={18}/></div><span>Continue as a {active.label.toLowerCase()}</span></div>{submitted ? <div className="success"><div className="success-icon"><Check/></div><h3>You’re on your way.</h3><p>We’ll use this email to create your {active.label.toLowerCase()} profile.</p><button className="text-button" onClick={() => setSubmitted(false)}>Use another email</button></div> : <form onSubmit={e => { e.preventDefault(); if (email) setSubmitted(true) }}><label>Email address</label><div className="input-row"><input type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required/><button className="button button-orange">Continue <ArrowUpRight size={17}/></button></div><div className="form-foot"><span>Already have an account?</span><button type="button" className="text-button">Sign in</button></div></form>}</div></section>
-    <section className="featured"><div className="featured-top"><div><span className="section-number">03 / JUST IN</span><h2>Worth a look.</h2></div><button className="browse-button">See all roles <ArrowUpRight size={17}/></button></div><div className="job-list">{jobs.map(job => <article className="job-row" key={job.title}><div className={`job-dot ${job.color}`}></div><div className="job-main"><h3>{job.title}</h3><p>{job.company} <span>·</span> {job.location}</p></div><span className="job-type">{job.type}</span><ArrowUpRight className="row-arrow" size={19}/></article>)}</div></section>
-    <footer><div className="brand"><span className="brand-mark">↗</span> wayfinder</div><span>Made for the next good thing.</span><span>© 2025 Wayfinder</span></footer>
-  </main>
-}
-createRoot(document.getElementById('root')).render(<App />)
+function BrandMark() { return <span className="brand-mark" aria-hidden="true"><span>MA</span></span> }
 
+function App() {
+  const [view, setView] = useState('students')
+  const [query, setQuery] = useState('')
+  const [saved, setSaved] = useState([])
+  const [email, setEmail] = useState('')
+  const [subscribed, setSubscribed] = useState(false)
+  const filteredJobs = useMemo(() => jobs.filter(job => `${job.title} ${job.company} ${job.location}`.toLowerCase().includes(query.toLowerCase())), [query])
+  const toggleSaved = id => setSaved(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id])
+
+  return <div className="app-shell">
+    <aside className="sidebar">
+      <div className="sidebar-brand"><BrandMark /><span>myAcademic</span></div><div className="sidebar-rule" />
+      <nav className="side-nav" aria-label="Main navigation">
+        <a className="side-link active" href="#home"><BriefcaseBusiness size={19} /><span>Career home</span></a><a className="side-link" href="#roles"><Search size={19} /><span>Browse roles</span></a><a className="side-link" href="#how-it-works"><GraduationCap size={19} /><span>Career toolkit</span></a><a className="side-link" href="#employers"><Building2 size={19} /><span>For employers</span></a>
+      </nav>
+      <div className="sidebar-bottom"><button className="notification" aria-label="Notifications"><Bell size={19} /><i>3</i></button><button className="avatar" aria-label="Open profile">EC</button></div>
+    </aside>
+    <div className="page-shell">
+      <header className="topbar"><div className="mobile-brand"><BrandMark /><strong>myAcademic</strong></div><div className="topbar-spacer" /><span className="date-chip"><CalendarDays size={15} /> Wednesday · September 23, 2026</span><button className="ta-button"><Sparkles size={15} /> Virtual TA</button></header>
+      <main>
+        <section className="hero" id="home"><div className="hero-copy"><div className="eyebrow"><span className="eyebrow-dot" /> Your next chapter starts here</div><h1>Find work that moves you <em>forward.</em></h1><p className="hero-lede">A career home for students, graduates, and the companies looking for their next great hire.</p><div className="hero-actions"><a className="primary-button" href="#roles">Explore opportunities <ArrowRight size={18} /></a><a className="secondary-link" href="#employers">I’m hiring <ArrowRight size={16} /></a></div></div>
+          <div className="hero-visual" aria-label="Career opportunities overview"><div className="visual-orbit orbit-a" /><div className="visual-orbit orbit-b" /><div className="opportunity-card"><div className="opportunity-top"><span className="status-dot" /> Recommended for you <span>✦</span></div><div className="company-line"><div className="company-logo northstar">N</div><div><strong>Northstar Health</strong><small>Health technology</small></div></div><h3>Product Design Intern</h3><div className="job-meta"><span><MapPin size={14} /> Remote</span><span>Summer 2026</span></div><button className="save-button" onClick={() => toggleSaved(1)}><Heart size={16} fill={saved.includes(1) ? 'currentColor' : 'none'} /> {saved.includes(1) ? 'Saved' : 'Save role'}</button></div><div className="visual-note note-one"><strong>24,812</strong><span>students finding their fit</span></div><div className="visual-note note-two"><Check size={14} /> Human-first matching</div></div>
+        </section>
+        <section className="role-switcher" id="how-it-works"><div><span className="section-label">START WHERE YOU ARE</span><h2>Built for your next move.</h2></div><div className="switcher-buttons"><button className={view === 'students' ? 'selected' : ''} onClick={() => setView('students')}><GraduationCap size={18} /> I’m a student</button><button className={view === 'employers' ? 'selected' : ''} onClick={() => setView('employers')}><Building2 size={18} /> I’m an employer</button></div><div className="switcher-copy">{view === 'students' ? <><strong>Discover opportunities made for your path.</strong><span>Search internships and early-career roles, save the ones that feel right, and keep your momentum going.</span><a href="#roles">Find your next role <ArrowRight size={15} /></a></> : <><strong>Meet the people who will move your team forward.</strong><span>Tell your story, share your open roles, and connect with students ready to do meaningful work.</span><a href="#employers">Start hiring <ArrowRight size={15} /></a></>}</div></section>
+        <section className="roles-section" id="roles"><div className="section-heading"><div><span className="section-label">01 / OPPORTUNITIES</span><h2>Worth a look.</h2></div><a className="view-all" href="#roles">View all roles <ArrowRight size={16} /></a></div><div className="search-row"><div className="search-box"><Search size={18} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by role, company, or location" /></div><button className="filter-button">All opportunities <ChevronDown size={16} /></button></div><div className="job-list">{filteredJobs.length ? filteredJobs.map(job => <article className="job-row" key={job.id}><div className={`company-logo ${job.accent}`}>{job.logo}</div><div className="job-main"><div className="job-title-line"><h3>{job.title}</h3><span className="job-type">{job.type}</span></div><p>{job.company} <span>·</span> {job.location}</p></div><span className="job-salary">{job.salary}</span><button className={`row-save ${saved.includes(job.id) ? 'saved' : ''}`} onClick={() => toggleSaved(job.id)} aria-label={`Save ${job.title}`}><Heart size={17} fill={saved.includes(job.id) ? 'currentColor' : 'none'} /></button><ArrowRight className="row-arrow" size={18} /></article>) : <div className="empty-state">No roles match “{query}”. Try a broader search.</div>}</div></section>
+        <section className="employer-banner" id="employers"><div className="banner-icon"><Users size={23} /></div><div><span className="section-label">FOR COMPANIES</span><h2>Good teams start with the right people.</h2><p>Reach students and graduates who are ready to make an impact.</p></div><a className="light-button" href="mailto:hiring@myacademic.org">Post an opportunity <ArrowRight size={17} /></a></section>
+        <section className="newsletter"><div><span className="section-label">STAY IN THE LOOP</span><h2>Opportunities, delivered.</h2><p>A short, useful roundup of new roles and career resources. No noise.</p></div>{subscribed ? <div className="subscribed"><Check size={20} /><strong>You’re on the list.</strong><span>We’ll send the next good thing your way.</span></div> : <form onSubmit={e => { e.preventDefault(); if (email) setSubscribed(true) }}><label htmlFor="email">Your email address</label><div className="newsletter-input"><input id="email" type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" /><button type="submit" aria-label="Subscribe"><ArrowRight size={18} /></button></div></form>}</section>
+      </main>
+      <footer><div className="footer-brand"><BrandMark /><strong>myAcademic</strong></div><span>Learn well. Work meaningfully.</span><span>© 2026 myAcademic</span></footer>
+    </div>
+  </div>
+}
+
+createRoot(document.getElementById('root')).render(<App />)
