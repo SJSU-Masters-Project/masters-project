@@ -21,7 +21,7 @@ from api.repositories import users as users_repo
 class Principal:
     user_id: str
     email: str
-    role: str  # "candidate" | "employer" | "admin"
+    role: str | None  # "candidate" | "employer" | "admin" | None (role not chosen yet)
     is_authenticated: bool = True
 
 

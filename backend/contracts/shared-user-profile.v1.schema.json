@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://myacademic.org/schemas/shared-user-profile.schema.json",
+  "title": "Shared User Profile",
+  "description": "Small integration contract shared by the Academic Records and Job Portal services.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "profileId",
+    "userId",
+    "personal",
+    "academic",
+    "certifications",
+    "achievements",
+    "career",
+    "jobPreferences",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "profileId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "userId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "personal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fullName", "email"],
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "location": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "academic": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["recordId", "institution", "program", "status", "verified"],
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "studentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "institution": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "program": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "degree": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "major": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "minor": {
+            "type": "string",
+            "maxLength": 150
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "graduationDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "gpa": {
+            "type": "number",
+            "minimum": 0
+          },
+          "gpaScale": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": ["enrolled", "graduated", "withdrawn", "unknown"]
+          },
+          "relevantCoursework": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "uniqueItems": true,
+            "maxItems": 50
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "lastSyncedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "certifications": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "issuer"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "issuer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "issueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "credentialId": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "credentialUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "verified": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "achievements": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "title"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["award", "honor", "scholarship", "achievement", "other"]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "issuer": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "career": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skills"],
+      "properties": {
+        "headline": {
+          "type": "string",
+          "maxLength": 220
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        },
+        "experience": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["company", "title"],
+            "properties": {
+              "company": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "startDate": {
+                "type": "string",
+                "pattern": "^[0-9]{4}(-(?:0[1-9]|1[0-2]))?$"
+              },
+              "endDate": {
+                "type": "string",
+                "pattern": "^[0-9]{4}(-(?:0[1-9]|1[0-2]))?$"
+              },
+              "current": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "projects": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        },
+        "resumeId": {
+          "type": "string",
+          "description": "Reference to the resume stored by the Job Portal; file content is not shared."
+        }
+      }
+    },
+    "jobPreferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["targetRoles", "employmentTypes", "workModes"],
+      "properties": {
+        "targetRoles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "uniqueItems": true,
+          "maxItems": 20
+        },
+        "employmentTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["full_time", "part_time", "internship", "contract", "co_op"]
+          },
+          "uniqueItems": true
+        },
+        "workModes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["on_site", "hybrid", "remote"]
+          },
+          "uniqueItems": true
+        },
+        "preferredLocations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "uniqueItems": true,
+          "maxItems": 20
+        },
+        "willingToRelocate": {
+          "type": "boolean"
+        },
+        "availableFrom": {
+          "type": "string",
+          "format": "date"
+        },
+        "requiresSponsorship": {
+          "type": "boolean"
+        }
+      }
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

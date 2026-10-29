@@ -3,6 +3,7 @@ djangorestframework>=3.16,<4.0
 drf-spectacular>=0.28,<1.0
 django-cors-headers>=4.3,<5.0
 pymongo>=4.6,<5.0
+PyJWT[crypto]>=2.8,<3.0
 python-dotenv>=1.0,<2.0
 jsonschema[format-nongpl]>=4.23,<5.0
 pypdf>=5.0,<6.0

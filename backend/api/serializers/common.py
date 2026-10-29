@@ -11,8 +11,12 @@ class HealthOut(serializers.Serializer):
 class MeOut(serializers.Serializer):
     id = serializers.CharField()
     email = serializers.EmailField()
-    role = serializers.CharField()
+    role = serializers.CharField(allow_null=True)
     created_at = serializers.CharField()
+
+
+class RoleIn(serializers.Serializer):
+    role = serializers.ChoiceField(choices=["candidate", "employer"])
 
 
 class ErrorDetail(serializers.Serializer):

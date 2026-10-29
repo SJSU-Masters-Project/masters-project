@@ -31,6 +31,16 @@ CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", default=["http://localho
 CAREERS_DEV_AUTH = env_bool("CAREERS_DEV_AUTH", default=False)
 APP_VERSION = os.getenv("APP_VERSION", "dev")
 
+# Clerk authentication (spec 04). CLERK_ISSUER is the instance's Frontend API URL; the JWKS
+# URL defaults to "<issuer>/.well-known/jwks.json". CLERK_AUTHORIZED_PARTIES is the list of
+# portal origins allowed in the token's "azp" claim.
+CLERK_ISSUER = os.getenv("CLERK_ISSUER", "")
+CLERK_JWKS_URL = os.getenv(
+    "CLERK_JWKS_URL",
+    f"{CLERK_ISSUER.rstrip('/')}/.well-known/jwks.json" if CLERK_ISSUER else "",
+)
+CLERK_AUTHORIZED_PARTIES = env_list("CLERK_AUTHORIZED_PARTIES", default=[])
+
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.staticfiles",
@@ -60,8 +70,16 @@ RESUME_LOCAL_ROOT = os.getenv("RESUME_LOCAL_ROOT", str(BASE_DIR / "var"))
 RESUME_S3_BUCKET = os.getenv("RESUME_S3_BUCKET", "")
 RESUME_S3_REGION = os.getenv("RESUME_S3_REGION", "us-west-2")
 
+# Real authentication (Clerk) is always first; development bearer auth is appended only
+# when CAREERS_DEV_AUTH is true (spec 04, Requirement 1.1). The spec 01 system check
+# (careers.E001) forbids CAREERS_DEV_AUTH while DEBUG is false, so dev auth never reaches
+# production.
+_AUTHENTICATION_CLASSES = ["api.auth_clerk.ClerkAuthentication"]
+if CAREERS_DEV_AUTH:
+    _AUTHENTICATION_CLASSES.append("api.auth.DevBearerAuthentication")
+
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ["api.auth.DevBearerAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": _AUTHENTICATION_CLASSES,
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "UNAUTHENTICATED_USER": None,  # required: django.contrib.auth is not installed
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",

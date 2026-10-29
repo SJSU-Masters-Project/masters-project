@@ -15,6 +15,7 @@ urlpatterns = [
     path("v1/health/", health_views.health, name="health-v1"),
     # Identity.
     path("v1/me", me_views.me, name="me"),
+    path("v1/me/role", me_views.me_role, name="me-role"),
     # Companies (spec 02).
     path("v1/companies", company_views.companies, name="companies"),
     path("v1/companies/mine", company_views.company_mine, name="company-mine"),

@@ -29,10 +29,66 @@ SJSU Masters project — a two-sided job application portal for companies and st
 - Lists use `?limit=` (default 20, max 100) and `?offset=`, returning
   `{"items": [...], "total": n, "limit": l, "offset": o}`.
 
+### Authentication
+
+Careers uses [Clerk](https://clerk.com) for real sign-in. The API verifies Clerk session
+tokens locally (RS256 against Clerk's JWKS) and never calls Clerk per request beyond
+fetching and caching signing keys. The `Principal` interface (`user_id`, `email`, `role`) is
+unchanged from spec 01, so feature endpoints are unaffected.
+
+Careers uses a **Clerk application created for careers alone** — it does not share a Clerk
+instance, user pool or session with MyAcademic. Sign-in only finds or creates the careers
+`users` record; it never reads or writes MyAcademic.
+
+#### Settings (environment variables)
+
+| Variable | Meaning |
+|---|---|
+| `CLERK_ISSUER` | The Clerk instance's Frontend API URL (e.g. `https://your-app.clerk.accounts.dev`). |
+| `CLERK_JWKS_URL` | JWKS endpoint. Leave blank to default to `<issuer>/.well-known/jwks.json`. |
+| `CLERK_AUTHORIZED_PARTIES` | Comma-separated portal origins allowed in the token's `azp` claim (e.g. `http://localhost:5173`). |
+
+#### Clerk dashboard setup (one-time handover)
+
+1. Create a **new Clerk application for careers only** — do not reuse any MyAcademic Clerk
+   instance, user pool or session.
+2. Add a **custom session-token claim** named `email`, mapped to the user's primary email.
+   Clerk does not include email in the session token by default, and the API reads the email
+   from this claim (spec 04, Requirement 4.4).
+3. Add every portal origin to `CLERK_AUTHORIZED_PARTIES` (the values Clerk puts in `azp`).
+4. Copy the Frontend API URL into `CLERK_ISSUER`.
+
+Claim names and verification steps were confirmed against Clerk's manual JWT verification
+guide: <https://clerk.com/docs/guides/sessions/manual-jwt-verification>.
+
+#### Choosing a role
+
+A user signs in with no role (`role: null`). They pick one once:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/me/role \
+  -H "Authorization: Bearer <clerk-session-jwt>" \
+  -H "Content-Type: application/json" \
+  -d '{"role": "candidate"}'   # or "employer"
+```
+
+A second attempt returns 409 `role_already_set`. A user with no role who calls an endpoint
+that needs one gets 403 `role_required`. Only `python manage.py set_admin <email>` grants the
+`admin` role; it cannot be chosen through the API.
+
+#### Frontend sign-in flow (handover to the portal owner)
+
+The React portal signs users in with Clerk's hosted components (sign-up, sign-in, sign-out
+and password reset are all Clerk's — the API has no login endpoints). Before **every** API
+request, call Clerk's `getToken()` and send the result as `Authorization: Bearer <token>`.
+Session tokens are short-lived, so never cache one — fetch a fresh token per request.
+
 ### Development authentication
 
-Real sign-in is a later spec. While `CAREERS_DEV_AUTH=true` (never in production), send a
-bearer token shaped `dev:<email>:<role>`, where role is `candidate`, `employer` or `admin`:
+For local runs and tests only. While `CAREERS_DEV_AUTH=true` (never in production; a startup
+system check forbids it with `DEBUG=false`), the `DevBearerAuthentication` class is appended
+*after* Clerk. Send a bearer token shaped `dev:<email>:<role>`, where role is `candidate`,
+`employer` or `admin`:
 
 ```bash
 curl -H "Authorization: Bearer dev:jordan@example.com:candidate" \

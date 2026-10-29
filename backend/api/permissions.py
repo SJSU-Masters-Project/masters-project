@@ -1,11 +1,17 @@
 """Role-based permission classes.
 
 ``request.user`` is a ``Principal`` when authenticated and ``None`` when anonymous.
-DRF's ``IsAuthenticated`` runs first (returns 401 for anonymous); these then enforce role
-and return 403 ``forbidden`` for the wrong role.
+DRF's ``IsAuthenticated`` runs first (returns 401 for anonymous); these then enforce role.
+
+A signed-in user may have no role yet (``role is None``) until they choose one via
+``POST /api/v1/me/role`` (spec 04). In that case these classes deny with 403 ``role_required``
+instead of the generic ``forbidden``, so the portal can route the user to role selection.
+The wrong (but set) role still yields 403 ``forbidden``.
 """
 
 from rest_framework.permissions import BasePermission
+
+from api.errors import ApiError
 
 
 class _RolePermission(BasePermission):
@@ -14,7 +20,11 @@ class _RolePermission(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        return user is not None and getattr(user, "role", None) in self.allowed_roles
+        role = getattr(user, "role", None)
+        if user is not None and role is None:
+            # Authenticated but no role chosen yet: distinct from a wrong role.
+            raise ApiError(403, "role_required", "Choose a role before using this endpoint.")
+        return user is not None and role in self.allowed_roles
 
 
 class IsCandidate(_RolePermission):
