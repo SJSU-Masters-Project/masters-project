@@ -1,0 +1,91 @@
+{
+  "judges": [
+    "claude-opus-4.5",
+    "deepseek-3.2",
+    "gpt-6.1-sol"
+  ],
+  "pairs": 1940,
+  "per_judge": {
+    "claude-opus-4.5": {
+      "answered": 1940,
+      "valid": 1875,
+      "valid_rate": 0.966,
+      "positive_rate": 0.298,
+      "unsure": 5,
+      "top_problems": [
+        [
+          "requirement not in job",
+          51
+        ],
+        [
+          "missing",
+          18
+        ],
+        [
+          "evidence not in candidate",
+          6
+        ]
+      ]
+    },
+    "deepseek-3.2": {
+      "answered": 1940,
+      "valid": 1701,
+      "valid_rate": 0.877,
+      "positive_rate": 0.332,
+      "unsure": 29,
+      "top_problems": [
+        [
+          "requirement not in job",
+          227
+        ],
+        [
+          "evidence not in candidate",
+          132
+        ],
+        [
+          "verdict 1 with no met requirement",
+          2
+        ],
+        [
+          "met without evidence",
+          1
+        ]
+      ]
+    },
+    "gpt-6.1-sol": {
+      "answered": 1694,
+      "valid": 1694,
+      "valid_rate": 1.0,
+      "positive_rate": 0.139,
+      "unsure": 36,
+      "top_problems": []
+    }
+  },
+  "outcome": {
+    "majority": 371,
+    "unanimous": 1377,
+    "unresolved": 192
+  },
+  "agreement": {
+    "pairs_with_all_valid_binary": 1413,
+    "fleiss_kappa": 0.526,
+    "pairwise_cohen_kappa (kappa, pairs)": {
+      "claude-opus-4.5 vs deepseek-3.2": [
+        0.7,
+        1628
+      ],
+      "claude-opus-4.5 vs gpt-6.1-sol": [
+        0.468,
+        1600
+      ],
+      "deepseek-3.2 vs gpt-6.1-sol": [
+        0.386,
+        1449
+      ]
+    }
+  },
+  "review_rows": {
+    "unresolved (must label)": 192,
+    "majority (check, optional)": 371
+  }
+}
