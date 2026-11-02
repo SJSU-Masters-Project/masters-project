@@ -39,7 +39,7 @@ u.write_text(s)
 print("patched test utilities")
 e = root / "src/evaluation/eval.py"; s = e.read_text()
 old = "        for k, v in self.test_ranking_data.items():\n            k = str(k)\n"
-new = old + "            if len(v.get(\"satisfied\", [])) < 2:   # a ranking needs at least two judged items\n                continue\n"
+new = old + "            if len(v.get(\"satisfied\", [])) < 2 or sum(v.get(\"satisfied\", [])) == 0:   # needs two judged items and at least one positive\n                continue\n"
 if new not in s:
     assert old in s
     s = s.replace(old, new, 1)
