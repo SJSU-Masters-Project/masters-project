@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "1.0",
+  "profileId": "profile_123",
+  "userId": "user_123",
+  "personal": {
+    "fullName": "Jordan Lee",
+    "email": "jordan.lee@example.com",
+    "phone": "+1-408-555-0100",
+    "location": "San Jose, CA"
+  },
+  "academic": [
+    {
+      "recordId": "education_002",
+      "studentId": "SJSU-123456",
+      "institution": "San Jose State University",
+      "program": "Computer Science",
+      "degree": "Master of Science",
+      "major": "Computer Science",
+      "startDate": "2025-08-20",
+      "graduationDate": "2027-05-20",
+      "gpa": 3.8,
+      "gpaScale": 4.0,
+      "status": "enrolled",
+      "relevantCoursework": ["Distributed Systems", "Machine Learning"],
+      "verified": true,
+      "lastSyncedAt": "2026-10-09T18:00:00Z"
+    },
+    {
+      "recordId": "education_001",
+      "studentId": "UCB-987654",
+      "institution": "Example State University",
+      "program": "Software Engineering",
+      "degree": "Bachelor of Science",
+      "major": "Software Engineering",
+      "startDate": "2021-08-20",
+      "graduationDate": "2025-05-20",
+      "gpa": 3.7,
+      "gpaScale": 4.0,
+      "status": "graduated",
+      "verified": true,
+      "lastSyncedAt": "2026-10-09T18:00:00Z"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Certified Cloud Practitioner",
+      "issuer": "Amazon Web Services",
+      "issueDate": "2026-03-10",
+      "expirationDate": "2029-03-10",
+      "credentialId": "AWS-CCP-123456",
+      "credentialUrl": "https://example.com/credentials/aws-ccp-123456",
+      "verified": true
+    }
+  ],
+  "achievements": [
+    {
+      "type": "award",
+      "title": "Best Graduate Project",
+      "issuer": "San Jose State University",
+      "date": "2026-05-15",
+      "description": "Recognized for the Campus Job Matcher project."
+    }
+  ],
+  "career": {
+    "headline": "Graduate student seeking frontend engineering roles",
+    "summary": "Software engineer interested in accessible web applications.",
+    "skills": ["JavaScript", "React", "Python"],
+    "experience": [
+      {
+        "company": "Example Labs",
+        "title": "Frontend Engineering Intern",
+        "startDate": "2026-06",
+        "endDate": "2026-08",
+        "current": false
+      }
+    ],
+    "projects": [
+      {
+        "name": "Campus Job Matcher",
+        "description": "A role-matching application for students.",
+        "url": "https://example.com/campus-job-matcher"
+      }
+    ],
+    "resumeId": "resume_456"
+  },
+  "jobPreferences": {
+    "targetRoles": ["Frontend Engineer", "Software Engineer"],
+    "employmentTypes": ["full_time", "internship"],
+    "workModes": ["hybrid", "remote"],
+    "preferredLocations": ["San Francisco Bay Area", "Remote - US"],
+    "willingToRelocate": false,
+    "availableFrom": "2027-06-01",
+    "requiresSponsorship": false
+  },
+  "updatedAt": "2026-10-09T18:00:00Z"
+}
