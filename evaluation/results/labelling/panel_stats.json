@@ -84,8 +84,22 @@
       ]
     }
   },
-  "review_rows": {
-    "unresolved (must label)": 192,
-    "majority (check, optional)": 371
+  "spotcheck": {
+    "pairs": 0,
+    "accuracy": null,
+    "cohen_kappa_panel_vs_human": null
+  },
+  "final": {
+    "labelled": 1748,
+    "unlabelled (dropped)": 192,
+    "by_source": {
+      "majority": 371,
+      "unanimous": 1377
+    },
+    "positives_by_split": {
+      "test": "145/479",
+      "valid": "39/192",
+      "train": "264/1077"
+    }
   }
 }
