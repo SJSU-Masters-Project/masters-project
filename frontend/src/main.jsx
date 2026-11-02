@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from '@clerk/react'
 import { ArrowRight, Bell, BriefcaseBusiness, Building2, CalendarDays, Check, ChevronDown, GraduationCap, Heart, MapPin, Search, Sparkles, Users } from 'lucide-react'
 import './styles.css'
 
@@ -10,6 +11,16 @@ const jobs = [
 ]
 
 function BrandMark() { return <span className="brand-mark" aria-hidden="true"><span>MA</span></span> }
+
+function AuthControls() {
+  return <div className="auth-controls" aria-label="Account">
+    <Show when="signed-out">
+      <SignInButton mode="modal"><button type="button" className="auth-sign-in">Sign in</button></SignInButton>
+      <SignUpButton mode="modal"><button type="button" className="auth-sign-up">Sign up</button></SignUpButton>
+    </Show>
+    <Show when="signed-in"><UserButton /></Show>
+  </div>
+}
 
 function App() {
   const [view, setView] = useState('students')
@@ -26,10 +37,10 @@ function App() {
       <nav className="side-nav" aria-label="Main navigation">
         <a className="side-link active" href="#home"><BriefcaseBusiness size={19} /><span>Career home</span></a><a className="side-link" href="#roles"><Search size={19} /><span>Browse roles</span></a><a className="side-link" href="#how-it-works"><GraduationCap size={19} /><span>Career toolkit</span></a><a className="side-link" href="#employers"><Building2 size={19} /><span>For employers</span></a>
       </nav>
-      <div className="sidebar-bottom"><button className="notification" aria-label="Notifications"><Bell size={19} /><i>3</i></button><button className="avatar" aria-label="Open profile">EC</button></div>
+      <div className="sidebar-bottom"><button className="notification" aria-label="Notifications"><Bell size={19} /><i>3</i></button></div>
     </aside>
     <div className="page-shell">
-      <header className="topbar"><div className="mobile-brand"><BrandMark /><strong>myAcademic</strong></div><div className="topbar-spacer" /><span className="date-chip"><CalendarDays size={15} /> Wednesday · September 23, 2026</span><button className="ta-button"><Sparkles size={15} /> Virtual TA</button></header>
+      <header className="topbar"><div className="mobile-brand"><BrandMark /><strong>myAcademic</strong></div><div className="topbar-spacer" /><span className="date-chip"><CalendarDays size={15} /> Wednesday · September 23, 2026</span><button className="ta-button"><Sparkles size={15} /> Virtual TA</button><AuthControls /></header>
       <main>
         <section className="hero" id="home"><div className="hero-copy"><div className="eyebrow"><span className="eyebrow-dot" /> Your next chapter starts here</div><h1>Find work that moves you <em>forward.</em></h1><p className="hero-lede">A career home for students, graduates, and the companies looking for their next great hire.</p><div className="hero-actions"><a className="primary-button" href="#roles">Explore opportunities <ArrowRight size={18} /></a><a className="secondary-link" href="#employers">I’m hiring <ArrowRight size={16} /></a></div></div>
           <div className="hero-visual" aria-label="Career opportunities overview"><div className="visual-orbit orbit-a" /><div className="visual-orbit orbit-b" /><div className="opportunity-card"><div className="opportunity-top"><span className="status-dot" /> Recommended for you <span>✦</span></div><div className="company-line"><div className="company-logo northstar">N</div><div><strong>Northstar Health</strong><small>Health technology</small></div></div><h3>Product Design Intern</h3><div className="job-meta"><span><MapPin size={14} /> Remote</span><span>Summer 2026</span></div><button className="save-button" onClick={() => toggleSaved(1)}><Heart size={16} fill={saved.includes(1) ? 'currentColor' : 'none'} /> {saved.includes(1) ? 'Saved' : 'Save role'}</button></div><div className="visual-note note-one"><strong>24,812</strong><span>students finding their fit</span></div><div className="visual-note note-two"><Check size={14} /> Human-first matching</div></div>
@@ -44,4 +55,19 @@ function App() {
   </div>
 }
 
-createRoot(document.getElementById('root')).render(<App />)
+const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+createRoot(document.getElementById('root')).render(
+  publishableKey ? <ClerkProvider
+    publishableKey={publishableKey}
+    signInFallbackRedirectUrl="/"
+    signUpFallbackRedirectUrl="/"
+    afterSignOutUrl="/"
+    appearance={{ variables: { colorPrimary: '#075da8', borderRadius: '6px' } }}
+  >
+    <App />
+  </ClerkProvider> : <main className="auth-setup-message" role="alert">
+    <h1>Authentication setup is pending</h1>
+    <p>The Clerk development key must be configured before you can use this app. Follow the authentication setup instructions in the project README, then restart the development server.</p>
+  </main>
+)
