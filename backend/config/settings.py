@@ -35,9 +35,10 @@ APP_VERSION = os.getenv("APP_VERSION", "dev")
 # URL defaults to "<issuer>/.well-known/jwks.json". CLERK_AUTHORIZED_PARTIES is the list of
 # portal origins allowed in the token's "azp" claim.
 CLERK_ISSUER = os.getenv("CLERK_ISSUER", "")
-CLERK_JWKS_URL = os.getenv(
-    "CLERK_JWKS_URL",
-    f"{CLERK_ISSUER.rstrip('/')}/.well-known/jwks.json" if CLERK_ISSUER else "",
+# "or", not a getenv default: a blank "CLERK_JWKS_URL=" line (as in .env.example) sets the
+# variable to "", which must still fall back to the issuer's JWKS URL.
+CLERK_JWKS_URL = os.getenv("CLERK_JWKS_URL") or (
+    f"{CLERK_ISSUER.rstrip('/')}/.well-known/jwks.json" if CLERK_ISSUER else ""
 )
 CLERK_AUTHORIZED_PARTIES = env_list("CLERK_AUTHORIZED_PARTIES", default=[])
 

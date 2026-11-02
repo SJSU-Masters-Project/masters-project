@@ -12,6 +12,9 @@ on:
       - "backend/**"
       - "requirements*.txt"
       - ".github/workflows/backend-ci.yml"
+      # A passing run on main triggers deploy-backend.yml, so deploy changes go through here too.
+      - "deploy/backend/**"
+      - ".github/workflows/deploy-backend.yml"
 
 jobs:
   test:

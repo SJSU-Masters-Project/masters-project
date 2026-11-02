@@ -1,0 +1,27 @@
+# Installed to /etc/systemd/system/ by deploy/backend/remote-deploy.sh on every backend deploy.
+[Unit]
+Description=Careers API (Django + gunicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=careers
+Group=careers
+WorkingDirectory=/opt/careers/app/backend
+# Bound to localhost only; nginx proxies https://<host>/api/ here.
+ExecStart=/opt/careers/venv/bin/gunicorn config.wsgi:application \
+    --bind 127.0.0.1:8000 \
+    --workers 3 \
+    --timeout 60 \
+    --access-logfile -
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/careers/data
+
+[Install]
+WantedBy=multi-user.target

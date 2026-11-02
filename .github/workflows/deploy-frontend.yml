@@ -6,10 +6,15 @@ on:
       - main
     paths:
       - "frontend/**"
-      - ".github/workflows/deploy.yml"
+      - ".github/workflows/deploy-frontend.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -30,8 +35,35 @@ jobs:
         working-directory: frontend
         run: npm ci
 
+      # Vite bakes VITE_* values into the bundle at build time, so they are set here, not on
+      # the server. Both are public (they end up in the browser), so they are repository
+      # variables, not secrets.
+      - name: Check production build settings
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL || (vars.CAREERS_HOST && format('https://{0}/api', vars.CAREERS_HOST)) }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ vars.VITE_CLERK_PUBLISHABLE_KEY }}
+        run: |
+          fail=0
+          if [ -z "$VITE_API_URL" ]; then
+            echo "::error::Set the CAREERS_HOST repository variable (e.g. careers.myacademic.org) or VITE_API_URL."
+            fail=1
+          fi
+          case "$VITE_CLERK_PUBLISHABLE_KEY" in
+            pk_live_*) ;;
+            "")
+              echo "::error::Set the VITE_CLERK_PUBLISHABLE_KEY repository variable to the Clerk production instance's pk_live_ key."
+              fail=1 ;;
+            *)
+              echo "::error::VITE_CLERK_PUBLISHABLE_KEY is not a production key (expected pk_live_...). Development keys must not ship to prod."
+              fail=1 ;;
+          esac
+          exit "$fail"
+
       - name: Build frontend
         working-directory: frontend
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL || (vars.CAREERS_HOST && format('https://{0}/api', vars.CAREERS_HOST)) }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ vars.VITE_CLERK_PUBLISHABLE_KEY }}
         run: npm run build
 
       - name: Configure SSH
