@@ -1,7 +1,43 @@
 """Authentication class wiring and the production guard (spec 04, Req 1 & 3)."""
 
+import importlib.util
+from pathlib import Path
+
 from django.conf import settings
 from django.test import override_settings
+
+_SETTINGS_FILE = Path(__file__).resolve().parent.parent / "config" / "settings.py"
+
+
+def _load_settings_module(monkeypatch, **env):
+    """Execute a fresh copy of config/settings.py under the given environment.
+
+    Loaded under a private module name so Django's live settings are untouched. Every value is
+    set explicitly, so the developer's own .env (which never overrides) cannot leak in.
+    """
+    for name, value in env.items():
+        monkeypatch.setenv(name, value)
+    spec = importlib.util.spec_from_file_location("_settings_under_test", _SETTINGS_FILE)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_blank_jwks_url_falls_back_to_issuer(monkeypatch):
+    # .env.example ships "CLERK_JWKS_URL=" (blank), which sets the variable to "".
+    module = _load_settings_module(
+        monkeypatch, CLERK_ISSUER="https://clerk.example.com", CLERK_JWKS_URL=""
+    )
+    assert module.CLERK_JWKS_URL == "https://clerk.example.com/.well-known/jwks.json"
+
+
+def test_explicit_jwks_url_is_kept(monkeypatch):
+    module = _load_settings_module(
+        monkeypatch,
+        CLERK_ISSUER="https://clerk.example.com",
+        CLERK_JWKS_URL="https://keys.example.com/jwks.json",
+    )
+    assert module.CLERK_JWKS_URL == "https://keys.example.com/jwks.json"
 
 
 def _build_auth_classes(dev_auth: bool) -> list[str]:

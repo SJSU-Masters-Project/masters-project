@@ -20,6 +20,53 @@ SJSU Masters project — a two-sided job application portal for companies and st
 6. Start the API: `cd backend && python manage.py runserver`.
 7. In another terminal, run `cd frontend && npm install && npm run dev`.
 
+## Production deployment
+
+GitHub Actions deploys both halves to the EC2 host behind one nginx, so the API is served from
+the site's own origin (`https://careers.myacademic.org/api/`):
+
+- `deploy-frontend.yml` builds the React app on every push to `main` that touches `frontend/`
+  and copies it to `/var/www/careers.myacademic.org`.
+- `deploy-backend.yml` runs after `backend-ci` passes on `main` (or by hand from the Actions
+  tab). It writes the production `.env` from the settings below, checks the new code against
+  it (`manage.py check --deploy`, `ensure_indexes`), then swaps it into `/opt/careers/app` and
+  restarts the `careers-api` systemd service (gunicorn on `127.0.0.1:8000`). Uploaded resumes
+  live in `/opt/careers/data/resumes`, outside the code, so redeploys never touch them.
+
+Both workflows fail with a clear message when a setting is missing, a Clerk **development**
+key or instance is used, or `CLERK_ISSUER` has a trailing slash.
+
+### GitHub settings (Settings → Secrets and variables → Actions)
+
+| Name | Kind | Value |
+|---|---|---|
+| `EC2_SSH_KEY`, `KNOWN_HOSTS`, `EC2_USER`, `EC2_HOST` | secret | Already used by the frontend deploy. |
+| `DJANGO_SECRET_KEY` | secret | ≥ 50 chars: `python3 -c 'import secrets; print(secrets.token_urlsafe(50))'` |
+| `MONGODB_URI` | secret | Production MongoDB connection string. |
+| `CAREERS_HOST` | variable | `careers.myacademic.org` (bare hostname). |
+| `CLERK_ISSUER` | variable | Production instance's Frontend API URL, e.g. `https://clerk.careers.myacademic.org` — no trailing slash. |
+| `VITE_CLERK_PUBLISHABLE_KEY` | variable | Production instance's `pk_live_…` key (public; it ships in the bundle). |
+| `CLERK_AUTHORIZED_PARTIES` | variable, optional | Defaults to `https://$CAREERS_HOST`. Comma-separate extra origins (e.g. `www.`). |
+| `VITE_API_URL` | variable, optional | Defaults to `https://$CAREERS_HOST/api`. |
+| `MONGODB_DATABASE`, `RESUME_STORAGE`, `RESUME_S3_BUCKET`, `RESUME_S3_REGION` | variable, optional | Default `career_portal` and `local` storage. |
+
+### One-time server setup
+
+1. Install Python 3.12 on the host: `sudo dnf install -y python3.12`.
+2. Paste `deploy/backend/nginx-careers-api.conf` into the HTTPS `server` block for the site,
+   then `sudo nginx -t && sudo systemctl reload nginx`.
+3. Run **Deploy backend** once from the Actions tab (later deploys run automatically).
+4. After the admin has signed in once: `cd /opt/careers/app/backend && sudo -u careers
+   /opt/careers/venv/bin/python manage.py set_admin <email>`.
+
+### Clerk production instance
+
+The development instance (`*.clerk.accounts.dev`, `pk_test_…`) is for local use only. In the
+Clerk dashboard, create the careers app's **production** instance on `careers.myacademic.org`,
+add the DNS records it lists, add the `email` session-token claim again (see
+[Clerk dashboard setup](#clerk-dashboard-setup-one-time-handover)), and set up your own OAuth
+credentials for any social logins. Users do not carry over from development.
+
 ## API
 
 - Base path: `/api/v1/`. The legacy health check stays at `/api/health/`.

@@ -1,0 +1,90 @@
+name: Deploy backend
+
+# Deploys the Django API to the EC2 host, behind the same nginx that serves the frontend.
+# Runs only after backend-ci passes on a push to main, or when started by hand.
+on:
+  workflow_run:
+    workflows: [backend-ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # A workflow_run event also fires for pull-request CI runs (including forks); deploy only
+    # after a successful CI run on a push, so untested or outside code never gets the secrets.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Deploy the exact commit CI tested, not whatever main points to now.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Build the production .env
+        env:
+          CAREERS_HOST: ${{ vars.CAREERS_HOST }}
+          CLERK_ISSUER: ${{ vars.CLERK_ISSUER }}
+          CLERK_AUTHORIZED_PARTIES: ${{ vars.CLERK_AUTHORIZED_PARTIES }}
+          MONGODB_DATABASE: ${{ vars.MONGODB_DATABASE }}
+          RESUME_STORAGE: ${{ vars.RESUME_STORAGE }}
+          RESUME_S3_BUCKET: ${{ vars.RESUME_S3_BUCKET }}
+          RESUME_S3_REGION: ${{ vars.RESUME_S3_REGION }}
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          APP_VERSION: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: bash deploy/backend/build-env.sh "$RUNNER_TEMP/careers.env"
+
+      - name: Configure SSH
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/deploy_key
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Upload code and .env
+        env:
+          TARGET: ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}
+        run: |
+          rsync -azR --delete --exclude '__pycache__/' \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            backend requirements.txt deploy/backend \
+            "$TARGET:/tmp/careers-api/"
+          # The .env goes over stdin so its secrets never appear on a command line.
+          ssh -i ~/.ssh/deploy_key "$TARGET" 'umask 077 && cat > /tmp/careers-api.env' \
+            < "$RUNNER_TEMP/careers.env"
+          rm -f "$RUNNER_TEMP/careers.env"
+
+      - name: Install and restart the API on EC2
+        env:
+          TARGET: ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}
+          CAREERS_HOST: ${{ vars.CAREERS_HOST }}
+        run: |
+          ssh -i ~/.ssh/deploy_key "$TARGET" \
+            "sudo bash /tmp/careers-api/deploy/backend/remote-deploy.sh '$CAREERS_HOST'"
+
+      - name: Check the public API URL
+        env:
+          CAREERS_HOST: ${{ vars.CAREERS_HOST }}
+        run: |
+          if curl -fsS --max-time 10 "https://$CAREERS_HOST/api/health/" | grep -q '"status":"ok"'; then
+            echo "API is live at https://$CAREERS_HOST/api/"
+          else
+            echo "::warning::The API is running on the server, but https://$CAREERS_HOST/api/health/ did not answer. Check that nginx proxies /api/ to 127.0.0.1:8000 (see deploy/backend/nginx-careers-api.conf)."
+          fi
