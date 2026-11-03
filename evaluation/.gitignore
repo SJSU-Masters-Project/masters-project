@@ -1,0 +1,15 @@
+data/
+**/pairs/
+**/docs/
+**/labels/*.jsonl
+judges.json
+*.npy
+*.zip
+*.ckpt
+*.pt
+*.bin
+*.safetensors
+checkpoints/
+.ipynb_checkpoints/
+__pycache__/
+.venv/

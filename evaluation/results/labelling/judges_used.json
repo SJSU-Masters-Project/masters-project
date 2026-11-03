@@ -1,0 +1,42 @@
+[
+  {
+    "name": "claude-opus-4.5",
+    "cmd": [
+      "kiro-cli",
+      "chat",
+      "--no-interactive",
+      "--trust-tools=",
+      "--model",
+      "claude-opus-4.5"
+    ],
+    "input": "stdin",
+    "timeout": 300
+  },
+  {
+    "name": "gpt-6.1-sol",
+    "cmd": [
+      "codex",
+      "exec",
+      "--sandbox",
+      "read-only",
+      "--skip-git-repo-check",
+      "-c",
+      "mcp_servers={}"
+    ],
+    "input": "stdin",
+    "timeout": 300
+  },
+  {
+    "name": "deepseek-3.2",
+    "cmd": [
+      "kiro-cli",
+      "chat",
+      "--no-interactive",
+      "--trust-tools=",
+      "--model",
+      "deepseek-3.2"
+    ],
+    "input": "stdin",
+    "timeout": 300
+  }
+]
