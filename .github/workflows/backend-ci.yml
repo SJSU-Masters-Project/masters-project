@@ -23,6 +23,10 @@ jobs:
     services:
       mongo:
         image: mongo:8.0
+        env:
+          # MongoDB 8.0 refuses to start on Linux kernels 6.19 to 7.0.13 (SERVER-121912),
+          # which GitHub's runners now use. Remove once runners are on kernel 7.0.14 or later.
+          GLIBC_TUNABLES: glibc.pthread.rseq=1
         ports:
           - 27017:27017
         options: >-
