@@ -1,0 +1,218 @@
+/* Login page. Tokens and sizes follow PLATFORM_UI_HANDOFF.md sections 4 to 6. */
+:root {
+    --color-primary: #0055a2;
+    --color-primary-hover: #0076d1;
+    --color-bg: #f7f7f7;
+    --color-surface-1: #ffffff;
+    --color-surface-2: #f2f4f8;
+    --color-text: #1a1f2b;
+    --color-text-muted: #4b5565;
+    --color-border: #d8dee8;
+    --color-error: #c62828;
+    --color-danger-bg: #ffdddd;
+    --color-input-bg: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+        --color-primary: #2b7acb;
+        --color-primary-hover: #3a8fe0;
+        --color-bg: #0f141b;
+        --color-surface-1: #151b23;
+        --color-surface-2: #1b2430;
+        --color-text: #f1f5fa;
+        --color-text-muted: #c2cad6;
+        --color-border: #2a3441;
+        --color-error: #e57373;
+        --color-danger-bg: #3a1414;
+        --color-input-bg: #101821;
+    }
+}
+
+.login-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2.25rem 16px;
+    background: var(--color-bg, #f7f7f7);
+    color: var(--color-text, #0f172a);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-surface-1, #ffffff);
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 12px;
+    padding: 1.75rem 1.5rem;
+}
+
+.login-wordmark {
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: var(--color-primary, #0055a2);
+    margin-bottom: 1.5rem;
+}
+.login-wordmark em {
+    font-style: italic;
+}
+
+.login-title {
+    margin: 0 0 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-text, #0f172a);
+}
+.login-title-icon {
+    color: var(--color-primary, #0055a2);
+}
+
+.login-subtitle {
+    margin: 0 0 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text-muted, #64748b);
+}
+
+.login-label {
+    display: block;
+    margin: 1rem 0 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text, #0f172a);
+}
+
+.login-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 42px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--color-border, #cbd5e1);
+    border-radius: 8px;
+    background: var(--color-surface-2, #f8fafc);
+    color: var(--color-text-muted, #64748b);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.login-input-wrap:hover {
+    border-color: var(--color-primary, #0055a2);
+}
+.login-input-wrap:focus-within {
+    border-color: var(--color-primary, #0055a2);
+    box-shadow: 0 0 0 3px rgba(0, 85, 162, 0.12);
+}
+.login-input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--color-text, #0f172a);
+    font-size: 0.95rem;
+}
+
+.login-roles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+.login-role {
+    height: 38px;
+    border: 1px solid var(--color-border, #cbd5e1);
+    border-radius: 8px;
+    background: var(--color-surface-1, #ffffff);
+    color: var(--color-text-muted, #64748b);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.login-role:hover:not(:disabled) {
+    border-color: rgba(0, 85, 162, 0.25);
+    background: rgba(0, 85, 162, 0.08);
+}
+.login-role.selected {
+    border-color: rgba(0, 85, 162, 0.25);
+    background: rgba(0, 85, 162, 0.08);
+    color: var(--color-primary, #0055a2);
+}
+
+.login-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 38px;
+    padding: 0 1rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+.login-btn.contained {
+    width: 100%;
+    margin-top: 1.5rem;
+    background: var(--color-primary, #0055a2);
+    color: #fff;
+}
+.login-btn.contained:hover:not(:disabled) {
+    background: var(--color-primary-hover, #0076d1);
+}
+.login-btn.outlined {
+    background: transparent;
+    border-color: var(--color-primary, #0055a2);
+    color: var(--color-primary, #0055a2);
+}
+.login-btn.small {
+    height: 30px;
+    margin-left: auto;
+}
+.login-btn:disabled,
+.login-role:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.login-btn:focus-visible,
+.login-role:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(0, 85, 162, 0.12);
+}
+
+.login-error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    background: var(--color-danger-bg, #ffdddd);
+    color: var(--color-error, #c62828);
+    font-size: 0.85rem;
+}
+
+.login-note {
+    margin: 1.25rem 0 0;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #64748b);
+    text-align: center;
+}
+
+.login-spin {
+    animation: login-spin 1s linear infinite;
+}
+@keyframes login-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .login-spin {
+        animation: none;
+    }
+}
