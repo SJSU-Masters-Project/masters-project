@@ -18,7 +18,11 @@ SJSU Masters project — a two-sided job application portal for companies and st
 4. Create the MongoDB indexes: `cd backend && python manage.py ensure_indexes`.
 5. Run the tests: `cd backend && pytest`.
 6. Start the API: `cd backend && python manage.py runserver`.
-7. In another terminal, run `cd frontend && npm install && npm run dev`.
+7. Sign-in uses the careers Clerk **development** instance (never the production one):
+   - `frontend/.env.local`: `VITE_CLERK_PUBLISHABLE_KEY=pk_test_…` (git-ignored).
+   - `.env`: `CLERK_ISSUER=https://<dev-instance>.clerk.accounts.dev` (its Frontend API URL).
+8. In another terminal, run `cd frontend && npm install && npm run dev`, then sign up at
+   <http://localhost:5173/sign-up>. API calls go to `/api`, which Vite proxies to port 8000.
 
 ## Production deployment
 
@@ -123,12 +127,14 @@ A second attempt returns 409 `role_already_set`. A user with no role who calls a
 that needs one gets 403 `role_required`. Only `python manage.py set_admin <email>` grants the
 `admin` role; it cannot be chosen through the API.
 
-#### Frontend sign-in flow (handover to the portal owner)
+#### Frontend sign-in flow
 
-The React portal signs users in with Clerk's hosted components (sign-up, sign-in, sign-out
-and password reset are all Clerk's — the API has no login endpoints). Before **every** API
-request, call Clerk's `getToken()` and send the result as `Authorization: Bearer <token>`.
-Session tokens are short-lived, so never cache one — fetch a fresh token per request.
+The React portal signs users in with Clerk's components from `@clerk/react` at `/login` and
+`/sign-up` (sign-in, sign-up, sign-out and password reset are all Clerk's — the API has no
+login endpoints). Call the API through `useApi()` in `frontend/src/api.js`: it calls Clerk's
+`getToken()` before **every** request and sends `Authorization: Bearer <token>`. Session
+tokens are short-lived, so never cache one. After a user's first sign-in, `RoleGate.jsx` asks
+them to choose candidate or employer (`POST /api/v1/me/role`) before showing the portal.
 
 ### Development authentication
 

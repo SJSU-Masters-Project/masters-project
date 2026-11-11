@@ -168,6 +168,10 @@
     border-color: var(--color-primary, #0055a2);
     color: var(--color-primary, #0055a2);
 }
+.login-btn.block {
+    width: 100%;
+    margin-top: 0.5rem;
+}
 .login-btn.small {
     height: 30px;
     margin-left: auto;
