@@ -94,9 +94,16 @@ class ClerkAuthentication(BaseAuthentication):
         if claims.get("sts") == "pending":
             raise AuthenticationFailed("Token is in a pending state.")
 
-        user = users_repo.get_or_create_external(
-            "clerk", claims["sub"], claims.get("email"), role=None
-        )
+        # Clerk only puts the email in the session token when the instance adds an "email"
+        # claim (README: Clerk dashboard setup). Refuse clearly rather than fail on a None.
+        email = (claims.get("email") or "").strip()
+        if not email:
+            raise AuthenticationFailed(
+                "Session token has no email claim. Add it in Clerk: "
+                "Sessions → Customize session token."
+            )
+
+        user = users_repo.get_or_create_external("clerk", claims["sub"], email, role=None)
         return (Principal(str(user["_id"]), user["email"], user["role"]), None)
 
     def authenticate_header(self, request):

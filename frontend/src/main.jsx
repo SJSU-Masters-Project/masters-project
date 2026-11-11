@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ArrowRight, Bell, BriefcaseBusiness, Building2, CalendarDays, Check, ChevronDown, GraduationCap, Heart, MapPin, Search, Sparkles, Users } from 'lucide-react'
-import LoginPage from './LoginPage'
-import { loadSession } from './auth'
+import { ClerkProvider, Show, UserButton, useAuth } from '@clerk/react'
+import { LoginPage, SignUpPage } from './LoginPage'
+import RoleGate from './RoleGate'
 import './styles.css'
 
 const jobs = [
@@ -31,7 +32,7 @@ function App() {
       <div className="sidebar-bottom"><button className="notification" aria-label="Notifications"><Bell size={19} /><i>3</i></button><button className="avatar" aria-label="Open profile">EC</button></div>
     </aside>
     <div className="page-shell">
-      <header className="topbar"><div className="mobile-brand"><BrandMark /><strong>myAcademic</strong></div><div className="topbar-spacer" /><span className="date-chip"><CalendarDays size={15} /> Wednesday · September 23, 2026</span><a className="secondary-link" href="/login">Log in</a><button className="ta-button"><Sparkles size={15} /> Virtual TA</button></header>
+      <header className="topbar"><div className="mobile-brand"><BrandMark /><strong>myAcademic</strong></div><div className="topbar-spacer" /><span className="date-chip"><CalendarDays size={15} /> Wednesday · September 23, 2026</span><Show when="signed-out"><a className="secondary-link" href="/login">Log in</a></Show><Show when="signed-in"><UserButton /></Show><button className="ta-button"><Sparkles size={15} /> Virtual TA</button></header>
       <main>
         <section className="hero" id="home"><div className="hero-copy"><div className="eyebrow"><span className="eyebrow-dot" /> Your next chapter starts here</div><h1>Find work that moves you <em>forward.</em></h1><p className="hero-lede">A career home for students, graduates, and the companies looking for their next great hire.</p><div className="hero-actions"><a className="primary-button" href="#roles">Explore opportunities <ArrowRight size={18} /></a><a className="secondary-link" href="#employers">I’m hiring <ArrowRight size={16} /></a></div></div>
           <div className="hero-visual" aria-label="Career opportunities overview"><div className="visual-orbit orbit-a" /><div className="visual-orbit orbit-b" /><div className="opportunity-card"><div className="opportunity-top"><span className="status-dot" /> Recommended for you <span>✦</span></div><div className="company-line"><div className="company-logo northstar">N</div><div><strong>Northstar Health</strong><small>Health technology</small></div></div><h3>Product Design Intern</h3><div className="job-meta"><span><MapPin size={14} /> Remote</span><span>Summer 2026</span></div><button className="save-button" onClick={() => toggleSaved(1)}><Heart size={16} fill={saved.includes(1) ? 'currentColor' : 'none'} /> {saved.includes(1) ? 'Saved' : 'Save role'}</button></div><div className="visual-note note-one"><strong>24,812</strong><span>students finding their fit</span></div><div className="visual-note note-two"><Check size={14} /> Human-first matching</div></div>
@@ -46,17 +47,25 @@ function App() {
   </div>
 }
 
+// Clerk moves between pages with full page loads (no router is wired in), so the path is read
+// once per load. The portal renders before Clerk finishes loading (and even if it never does),
+// so signed-out visitors never see a blank page; signed-in users go through RoleGate, which
+// asks for a role on first sign-in.
 function Root() {
-  const [path, setPath] = useState(window.location.pathname)
-  const go = to => { window.history.pushState({}, '', to); setPath(to) }
-  React.useEffect(() => {
-    const onPop = () => setPath(window.location.pathname)
-    window.addEventListener('popstate', onPop)
-    return () => window.removeEventListener('popstate', onPop)
-  }, [])
-  // A signed-in visitor has no reason to see the login form.
-  if (path === '/login') return loadSession() ? (go('/'), null) : <LoginPage onSignedIn={() => go('/')} />
-  return <App />
+  const { isSignedIn } = useAuth()
+  const path = window.location.pathname
+  if (path.startsWith('/login')) return <LoginPage />
+  if (path.startsWith('/sign-up')) return <SignUpPage />
+  return isSignedIn ? <RoleGate><App /></RoleGate> : <App />
 }
 
-createRoot(document.getElementById('root')).render(<Root />)
+// Set at build time: frontend/.env.local locally (a pk_test_ key), the VITE_CLERK_PUBLISHABLE_KEY
+// repository variable in the deploy workflow (a pk_live_ key).
+const clerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+if (!clerkKey) throw new Error('Set VITE_CLERK_PUBLISHABLE_KEY in frontend/.env.local (see README).')
+
+createRoot(document.getElementById('root')).render(
+  <ClerkProvider publishableKey={clerkKey} signInUrl="/login" signUpUrl="/sign-up" afterSignOutUrl="/">
+    <Root />
+  </ClerkProvider>
+)
