@@ -10,9 +10,15 @@ from api.errors import ApiError
 from api.events import emit_event
 from api.ids import parse_object_id
 from api.permissions import IsCandidate
+from api.profile_sections import public_sections
 from api.repositories import profiles as profiles_repo
 from api.repositories import resumes as resumes_repo
-from api.serializers.profiles import ProfileBodyValidator, ProfileOut, SharedProfileOut
+from api.serializers.profiles import (
+    ProfileBodyValidator,
+    ProfileOut,
+    SharedProfileOut,
+    enforce_body_cap,
+)
 from api.timeutils import to_iso
 
 logger = logging.getLogger("api")
@@ -36,6 +42,9 @@ def _profile_out(doc: dict) -> dict:
     }
     for name in SECTION_KEYS:
         out[name] = doc.get(name)
+    # Prof. Dhar's section templates. Older profiles have neither key.
+    out["sections"] = doc.get("sections") or []
+    out["education"] = doc.get("education")
     return out
 
 
@@ -69,6 +78,7 @@ class ProfileMeView(APIView):
 
     @extend_schema(request=ProfileOut, responses=ProfileOut, operation_id="profiles_me_put")
     def put(self, request):
+        enforce_body_cap(request)
         sections, visibility, errors = ProfileBodyValidator(
             request.data, request.user.email
         ).validate()
@@ -90,6 +100,7 @@ class ProfileMeView(APIView):
         if profiles_repo.get_by_user(request.user.user_id) is None:
             raise ApiError(404, "profile_not_found", "You do not have a profile yet.")
 
+        enforce_body_cap(request)
         sections, visibility, errors = ProfileBodyValidator(
             request.data, request.user.email
         ).validate()
@@ -157,6 +168,7 @@ def _public_view(doc: dict) -> dict:
             }
         )
     career = doc.get("career", {}) or {}
+    visible = public_sections(doc)
     return {
         "id": str(doc["_id"]),
         "visibility": "public",
@@ -169,6 +181,9 @@ def _public_view(doc: dict) -> dict:
             for k in ("headline", "summary", "skills", "experience", "projects")
             if k in career
         },
+        # Sections the owner marked "visible: false" are left out.
+        "education": visible["education"],
+        "sections": visible["sections"],
     }
 
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { BriefcaseBusiness, Building2, CalendarDays, FileText, LogIn, LogOut, Moon, Sun, UserRound } from 'lucide-react'
+import { BriefcaseBusiness, Building2, CalendarDays, FileText, LogIn, LogOut, Moon, Sparkles, Sun, UserRound } from 'lucide-react'
 import { Link } from './router'
 import { useSession } from './session'
 import './shell.css'
@@ -34,6 +34,7 @@ export function useTheme() {
 function navItems({ isCandidate, isEmployer }) {
     const items = [{ to: '/jobs', label: 'Jobs', icon: BriefcaseBusiness, match: (p) => p === '/' || p.startsWith('/jobs') }]
     if (isCandidate) {
+        items.push({ to: '/career-match', label: 'CareerMatch', icon: Sparkles, match: (p) => p.startsWith('/career-match') })
         items.push({ to: '/profile', label: 'Profile', icon: UserRound, match: (p) => p.startsWith('/profile') })
         items.push({ to: '/resumes', label: 'Resumes', icon: FileText, match: (p) => p.startsWith('/resumes') })
     }
