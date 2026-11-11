@@ -106,6 +106,13 @@ function RoleChoice({ onChoose }) {
                         )}
                     </button>
                 </form>
+                {/* The role is permanent, so someone who signed in with the wrong account must be
+                    able to leave without choosing one. */}
+                <SignOutButton>
+                    <button type="button" className="login-btn outlined block" disabled={loading}>
+                        Not you? Sign out
+                    </button>
+                </SignOutButton>
             </main>
         </div>
     )
