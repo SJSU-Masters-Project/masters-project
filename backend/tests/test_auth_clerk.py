@@ -69,6 +69,20 @@ def test_bad_claims_give_401(api, db, token_kwargs):
     assert resp.json()["error"]["code"] == "authentication_failed"
 
 
+@pytest.mark.parametrize("email", [None, "", "   "], ids=["absent", "empty", "blank"])
+def test_token_without_email_claim_gives_401(api, db, email):
+    # Clerk leaves email out of session tokens unless the instance adds an "email" claim
+    # (README: Clerk dashboard setup). A token without one is refused clearly, not with a 500,
+    # and no user is created.
+    with clerk_env():
+        resp = _auth(api, make_token(email=email))
+    assert resp.status_code == 401
+    body = resp.json()["error"]
+    assert body["code"] == "authentication_failed"
+    assert "email claim" in body["message"]
+    assert db.users.count_documents({}) == 0
+
+
 def test_nbf_within_leeway_is_accepted(api, db):
     # 3 seconds in the future is within the 5s leeway.
     with clerk_env():
