@@ -8,6 +8,7 @@ import { EmptyState, Page } from './ui'
 import EmployerPage from './pages/EmployerPage'
 import JobDetailPage from './pages/JobDetailPage'
 import JobsPage from './pages/JobsPage'
+import CareerMatchPage from './pages/CareerMatchPage'
 import ProfilePage from './pages/ProfilePage'
 import ResumesPage from './pages/ResumesPage'
 import './theme.css'
@@ -32,6 +33,7 @@ function Routes({ path }) {
     const job = matchPath('/jobs/:id', path)
     if (path === '/' || path === '/jobs') return <JobsPage />
     if (job) return <JobDetailPage key={job.id} id={job.id} />
+    if (path === '/career-match') return <CareerMatchPage />
     if (path === '/profile') return <ProfilePage />
     if (path === '/resumes') return <ResumesPage />
     if (path === '/employer') return <EmployerPage />
