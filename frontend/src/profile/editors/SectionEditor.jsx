@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useState } from 'react'
+import React, { Suspense, lazy, useEffect, useId, useMemo, useState } from 'react'
 import { Loader2, Save } from 'lucide-react'
 import { Field, FormError } from '../../ui'
 import ui from '../../ui.module.css'
@@ -9,9 +9,11 @@ import ChipsEditor from './ChipsEditor'
 import EducationEditor from './EducationEditor'
 import LinksEditor from './LinksEditor'
 import ListEditor from './ListEditor'
-import TextEditor from './TextEditor'
 import TimelineEditor from './TimelineEditor'
 import styles from './editors.module.css'
+
+// The rich text editor (Tiptap) is large, so it loads only when a rich text section is edited.
+const TextEditor = lazy(() => import('./TextEditor'))
 
 const EDITORS = { cards: CardsEditor, timeline: TimelineEditor, list: ListEditor, chips: ChipsEditor, links: LinksEditor, text: TextEditor }
 

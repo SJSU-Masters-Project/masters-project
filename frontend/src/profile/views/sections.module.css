@@ -297,3 +297,72 @@
     color: var(--color-primary, #0055a2);
     font-weight: 600;
 }
+
+/* Section cards on the profile page */
+.sectionCard {
+    padding: 1.25rem;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 12px;
+    background: var(--color-surface-1, #ffffff);
+}
+.sectionHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.sectionHeading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+}
+.sectionTitle {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+    overflow-wrap: anywhere;
+}
+.sectionActions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+.iconBtn {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border, #d8dee8);
+    background: transparent;
+    color: var(--color-text, #0f172a);
+    cursor: pointer;
+}
+.iconBtn:hover:not(:disabled) {
+    background: rgba(0, 85, 162, 0.08);
+    border-color: rgba(0, 85, 162, 0.25);
+}
+.iconBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.iconBtnDanger:hover:not(:disabled) {
+    background: var(--color-danger-bg, #ffdddd);
+    border-color: var(--color-error, #c62828);
+    color: var(--color-error, #c62828);
+}
+.sectionEmpty {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #64748b);
+}
+.hiddenSection {
+    opacity: 0.85;
+    border-style: dashed;
+}

@@ -1,76 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Loader2, Save, UserRound } from 'lucide-react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Loader2, Plus, Save, UserRound } from 'lucide-react'
 import { api } from '../api'
-import { EMPLOYMENT_TYPES, WORK_MODES, detailLines, splitList } from '../format'
+import { EMPLOYMENT_TYPES, WORK_MODES, detailLines } from '../format'
+import { blankForm, deriveSkills, fromProfile, toBody, toEducationPatch, toForm, toSectionsPatch, withKeys } from '../profile/adapters'
+import AddSectionDialog from '../profile/editors/AddSectionDialog'
+import SectionEditor from '../profile/editors/SectionEditor'
+import SectionCard from '../profile/SectionCard'
+import { newEducation, newSection } from '../profile/templates'
+import { Dialog, EmptyState, ErrorState, Field, FormError, LoginRequired, Page, PageHeader, Pill, SkeletonGrid, Toast, cx } from '../ui'
 import { useSession } from '../session'
-import { EmptyState, ErrorState, Field, FormError, LoginRequired, Page, PageHeader, SkeletonGrid, Toast, cx } from '../ui'
 import ui from '../ui.module.css'
 import styles from './Profile.module.css'
-
-const blank = {
-    fullName: '',
-    phone: '',
-    location: '',
-    headline: '',
-    summary: '',
-    skills: '',
-    resumeId: '',
-    targetRoles: '',
-    employmentTypes: [],
-    workModes: [],
-    preferredLocations: '',
-    willingToRelocate: false,
-    visibility: 'private',
-}
-
-// Profile document -> editable form values.
-function toForm(profile) {
-    const p = profile.personal || {}
-    const c = profile.career || {}
-    const j = profile.jobPreferences || {}
-    return {
-        fullName: p.fullName || '',
-        phone: p.phone || '',
-        location: p.location || '',
-        headline: c.headline || '',
-        summary: c.summary || '',
-        skills: (c.skills || []).join(', '),
-        resumeId: c.resumeId || '',
-        targetRoles: (j.targetRoles || []).join(', '),
-        employmentTypes: j.employmentTypes || [],
-        workModes: j.workModes || [],
-        preferredLocations: (j.preferredLocations || []).join(', '),
-        willingToRelocate: Boolean(j.willingToRelocate),
-        visibility: profile.visibility || 'private',
-    }
-}
-
-const drop = (obj) => Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== '' && v !== undefined))
-
-// Form values -> request body. Fields the form does not edit (experience, projects,
-// availableFrom, ...) are carried over from the saved profile so they are not lost.
-function toBody(form, email, existing) {
-    const personal = { ...(existing?.personal || {}), email: existing?.personal?.email || email, fullName: form.fullName.trim() }
-    personal.phone = form.phone.trim()
-    personal.location = form.location.trim()
-    const career = {
-        ...(existing?.career || {}),
-        headline: form.headline.trim(),
-        summary: form.summary.trim(),
-        skills: splitList(form.skills),
-        resumeId: form.resumeId,
-    }
-    const prefs = {
-        ...(existing?.jobPreferences || {}),
-        targetRoles: splitList(form.targetRoles),
-        employmentTypes: form.employmentTypes,
-        workModes: form.workModes,
-        preferredLocations: splitList(form.preferredLocations),
-        willingToRelocate: form.willingToRelocate,
-    }
-    if (prefs.preferredLocations.length === 0) delete prefs.preferredLocations
-    return { visibility: form.visibility, personal: drop(personal), career: drop(career), jobPreferences: prefs }
-}
 
 function CheckGroup({ options, value, onChange, legend }) {
     const toggle = (v) => onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
@@ -86,18 +26,40 @@ function CheckGroup({ options, value, onChange, legend }) {
     )
 }
 
+const EDUCATION_EDITOR = 'education'
+
 export default function ProfilePage() {
     const { user, isLoggedIn, isCandidate } = useSession()
     const [existing, setExisting] = useState(null)
     const [resumes, setResumes] = useState([])
-    const [form, setForm] = useState(blank)
+    const [form, setForm] = useState(blankForm)
+    const [sections, setSections] = useState([])
+    const [education, setEducation] = useState(null)
     const [loading, setLoading] = useState(true)
     const [loadError, setLoadError] = useState(null)
     const [saving, setSaving] = useState(false)
     const [saveError, setSaveError] = useState(null)
     const [toast, setToast] = useState(null)
 
+    // Section editing: `editing` is a section's _key (or EDUCATION_EDITOR); `pending` is a section that is not saved yet.
+    const [editing, setEditing] = useState(null)
+    const [pending, setPending] = useState(null)
+    const [editorSaving, setEditorSaving] = useState(false)
+    const [editorError, setEditorError] = useState(null)
+    const [busyKey, setBusyKey] = useState(null)
+    const [addOpen, setAddOpen] = useState(false)
+    const [toDelete, setToDelete] = useState(null)
+    const [editorDirty, setEditorDirty] = useState(false)
+
     const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }))
+
+    const apply = useCallback((profile) => {
+        const parts = fromProfile(profile)
+        setExisting(profile)
+        setForm(toForm(profile))
+        setSections(parts.sections)
+        setEducation(parts.education)
+    }, [])
 
     const load = useCallback(async () => {
         setLoading(true)
@@ -110,15 +72,20 @@ export default function ProfilePage() {
                 }),
                 api('/resumes', { params: { limit: 100 } }),
             ])
-            setExisting(profile)
             setResumes(list.items)
-            setForm(profile ? toForm(profile) : blank)
+            if (profile) apply(profile)
+            else {
+                setExisting(null)
+                setForm(blankForm)
+                setSections([])
+                setEducation(null)
+            }
         } catch (err) {
             setLoadError(err.message || 'Unable to load your profile. Please try again later.')
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [apply])
 
     useEffect(() => {
         if (isLoggedIn && isCandidate) load()
@@ -127,22 +94,204 @@ export default function ProfilePage() {
 
     const closeToast = useCallback(() => setToast(null), [])
 
-    const save = async (event) => {
-        event.preventDefault()
+    // Unsaved edits: the details form differs from what was saved, or a section editor has changes.
+    const formDirty = useMemo(() => JSON.stringify(form) !== JSON.stringify(existing ? toForm(existing) : blankForm), [form, existing])
+    const dirty = formDirty || editorDirty
+    useEffect(() => {
+        if (!dirty) return undefined
+        const warn = (e) => {
+            e.preventDefault()
+            e.returnValue = ''
+        }
+        window.addEventListener('beforeunload', warn)
+        return () => window.removeEventListener('beforeunload', warn)
+    }, [dirty])
+
+    const save = async () => {
         if (saving) return
         setSaving(true)
         setSaveError(null)
         try {
-            const body = toBody(form, user.email, existing)
+            const body = toBody(form, sections, education, existing, user.email)
             const saved = await api('/profiles/me', { method: existing ? 'PATCH' : 'PUT', body })
-            setExisting(saved)
-            setForm(toForm(saved))
+            apply(saved)
             setToast({ severity: 'success', message: 'Profile saved.' })
         } catch (err) {
             setSaveError({ message: err.message || 'Could not save your profile.', lines: detailLines(err.details) })
         } finally {
             setSaving(false)
         }
+    }
+
+    const closeEditor = () => {
+        setEditing(null)
+        setPending(null)
+        setEditorError(null)
+        setEditorDirty(false)
+    }
+
+    // Saves a new array of sections (create, edit, hide, move, delete all go through here).
+    const patchSections = async (next) => {
+        const saved = await api('/profiles/me', { method: 'PATCH', body: toSectionsPatch(next, existing) })
+        apply(saved)
+    }
+
+    const saveSectionFromEditor = async (draft) => {
+        setEditorSaving(true)
+        setEditorError(null)
+        try {
+            if (editing === EDUCATION_EDITOR) {
+                const saved = await api('/profiles/me', { method: 'PATCH', body: toEducationPatch(draft) })
+                apply(saved)
+            } else if (pending) {
+                await patchSections([...sections, draft])
+            } else {
+                await patchSections(sections.map((s) => (s._key === draft._key ? draft : s)))
+            }
+            closeEditor()
+            setToast({ severity: 'success', message: 'Section saved.' })
+        } catch (err) {
+            setEditorError({ message: err.message || 'Could not save this section.', lines: detailLines(err.details) })
+        } finally {
+            setEditorSaving(false)
+        }
+    }
+
+    // Card actions that save straight away. Failures show a toast and leave the page as it was.
+    const quickChange = async (key, run, successMessage) => {
+        if (busyKey) return
+        setBusyKey(key)
+        try {
+            await run()
+            if (successMessage) setToast({ severity: 'success', message: successMessage })
+        } catch (err) {
+            setToast({ severity: 'error', message: err.message || 'Could not update your profile.' })
+        } finally {
+            setBusyKey(null)
+        }
+    }
+
+    const toggleVisible = (section) =>
+        quickChange(
+            section._key,
+            () => patchSections(sections.map((s) => (s._key === section._key ? { ...s, visible: !s.visible } : s))),
+            section.visible ? `${section.heading} is now hidden.` : `${section.heading} is now shown.`
+        )
+
+    const toggleEducationVisible = () =>
+        quickChange(EDUCATION_EDITOR, async () => {
+            const saved = await api('/profiles/me', {
+                method: 'PATCH',
+                body: toEducationPatch({ ...education, visible: !education.visible }),
+            })
+            apply(saved)
+        })
+
+    const move = (index, delta) => {
+        const next = [...sections]
+        ;[next[index], next[index + delta]] = [next[index + delta], next[index]]
+        quickChange(sections[index]._key, () => patchSections(next))
+    }
+
+    const confirmDelete = async () => {
+        const target = toDelete
+        setToDelete(null)
+        await quickChange(
+            target._key,
+            () => patchSections(sections.filter((s) => s._key !== target._key)),
+            `${target.heading} was deleted.`
+        )
+    }
+
+    const startAdd = ({ heading, template }) => {
+        const section = withKeys(newSection(template, heading))
+        setAddOpen(false)
+        setEditorError(null)
+        setPending(section)
+        setEditing(section._key)
+    }
+
+    const startEducation = () => {
+        setEditorError(null)
+        setEditing(EDUCATION_EDITOR)
+    }
+
+    const hasProfile = Boolean(existing)
+    const skills = useMemo(() => deriveSkills(sections), [sections])
+
+    const renderSection = (section, index) => {
+        if (editing === section._key) {
+            return (
+                <div key={section._key} className={ui.card}>
+                    <h2 className={ui.sectionTitle}>Edit {section.heading}</h2>
+                    <SectionEditor
+                        section={section}
+                        saving={editorSaving}
+                        error={editorError}
+                        onSave={saveSectionFromEditor}
+                        onCancel={closeEditor}
+                        onDirtyChange={setEditorDirty}
+                    />
+                </div>
+            )
+        }
+        return (
+            <SectionCard
+                key={section._key}
+                section={section}
+                busy={busyKey === section._key || editorSaving || editing !== null}
+                isFirst={index === 0}
+                isLast={index === sections.length - 1}
+                onEdit={() => {
+                    setEditorError(null)
+                    setPending(null)
+                    setEditing(section._key)
+                }}
+                onToggleVisible={() => toggleVisible(section)}
+                onMove={(delta) => move(index, delta)}
+                onDelete={() => setToDelete(section)}
+            />
+        )
+    }
+
+    let educationBlock
+    if (editing === EDUCATION_EDITOR) {
+        educationBlock = (
+            <div className={ui.card}>
+                <h2 className={ui.sectionTitle}>Edit Education</h2>
+                <SectionEditor
+                    section={education || withKeys(newEducation())}
+                    isEducation
+                    saving={editorSaving}
+                    error={editorError}
+                    onSave={saveSectionFromEditor}
+                    onCancel={closeEditor}
+                    onDirtyChange={setEditorDirty}
+                />
+            </div>
+        )
+    } else if (education) {
+        educationBlock = (
+            <SectionCard
+                section={education}
+                education
+                busy={busyKey === EDUCATION_EDITOR || editorSaving || editing !== null}
+                onEdit={startEducation}
+                onToggleVisible={toggleEducationVisible}
+            />
+        )
+    } else {
+        educationBlock = (
+            <section className={ui.card}>
+                <h2 className={ui.sectionTitle}>Education</h2>
+                <p className={ui.hint} style={{ marginBottom: '0.75rem' }}>
+                    You have not added any education yet.
+                </p>
+                <button type="button" className="btn outlined" onClick={startEducation} disabled={!hasProfile || editing !== null}>
+                    <Plus size={16} aria-hidden="true" /> Add education
+                </button>
+            </section>
+        )
     }
 
     let body
@@ -152,7 +301,7 @@ export default function ProfilePage() {
     else if (loadError) body = <ErrorState message={loadError} onRetry={load} />
     else
         body = (
-            <form onSubmit={save} className={styles.form} noValidate>
+            <div className={styles.form}>
                 <FormError message={saveError?.message} lines={saveError?.lines} />
 
                 <section className={ui.card}>
@@ -209,15 +358,22 @@ export default function ProfilePage() {
                     <Field label="Summary" htmlFor="pf-summary">
                         <textarea id="pf-summary" className={ui.textarea} value={form.summary} onChange={set('summary')} maxLength={3000} />
                     </Field>
-                    <Field label="Skills" htmlFor="pf-skills" hint="Separate with commas.">
-                        <input
-                            id="pf-skills"
-                            className={ui.input}
-                            value={form.skills}
-                            onChange={set('skills')}
-                            placeholder="Python, React, SQL"
-                        />
-                    </Field>
+                    <div className={ui.field}>
+                        <span className={ui.label}>Skills</span>
+                        {skills.length > 0 ? (
+                            <ul className={styles.skillList} aria-label="Skills from your skill sections">
+                                {skills.map((s) => (
+                                    <li key={s}>
+                                        <Pill>{s}</Pill>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : null}
+                        <span className={ui.hint}>
+                            Skills come from the skill sections below, so matching always uses what you show on your profile.
+                            {skills.length === 0 && ' Add a Skill chips section to list yours.'}
+                        </span>
+                    </div>
                     <Field
                         label="Resume linked to your profile"
                         htmlFor="pf-resume"
@@ -233,6 +389,33 @@ export default function ProfilePage() {
                         </select>
                     </Field>
                 </section>
+
+                {!hasProfile && (
+                    <p className={ui.hint}>Create your profile first. Education and custom sections can be added right after.</p>
+                )}
+
+                <div className={styles.sections}>
+                    {educationBlock}
+                    {sections.map(renderSection)}
+                    {pending && (
+                        <div className={ui.card}>
+                            <h2 className={ui.sectionTitle}>New section</h2>
+                            <SectionEditor
+                                section={pending}
+                                saving={editorSaving}
+                                error={editorError}
+                                onSave={saveSectionFromEditor}
+                                onCancel={closeEditor}
+                                onDirtyChange={setEditorDirty}
+                            />
+                        </div>
+                    )}
+                    {hasProfile && sections.length === 0 && !pending && (
+                        <p className={ui.hint}>
+                            Add sections such as projects, experience, certifications, skills, links or a short introduction.
+                        </p>
+                    )}
+                </div>
 
                 <section className={ui.card}>
                     <h2 className={ui.sectionTitle}>Job preferences</h2>
@@ -292,18 +475,57 @@ export default function ProfilePage() {
                 </section>
 
                 <div className={styles.footer}>
-                    <button type="submit" className="btn contained" disabled={saving || !form.fullName.trim()}>
+                    {formDirty && <span className={ui.hint}>You have unsaved changes to your details.</span>}
+                    <button type="button" className="btn contained" onClick={save} disabled={saving || !form.fullName.trim()}>
                         {saving ? <Loader2 size={16} className="spin" aria-hidden="true" /> : <Save size={16} aria-hidden="true" />}
                         {saving ? 'Saving…' : existing ? 'Save changes' : 'Create profile'}
                     </button>
                 </div>
-            </form>
+            </div>
         )
 
+    const canAdd = isLoggedIn && isCandidate && !loading && !loadError
     return (
         <Page>
-            <PageHeader icon={UserRound} title="Profile" subtitle="Keep your details current. This is what matching and employers see." />
+            <PageHeader
+                icon={UserRound}
+                title="Profile"
+                subtitle="Keep your details current. This is what matching and employers see."
+                actions={
+                    canAdd && (
+                        <button
+                            type="button"
+                            className="btn contained"
+                            onClick={() => setAddOpen(true)}
+                            disabled={!hasProfile || editing !== null}
+                            title={hasProfile ? undefined : 'Create your profile first'}
+                        >
+                            <Plus size={16} aria-hidden="true" /> Add section
+                        </button>
+                    )
+                }
+            />
             {body}
+            <AddSectionDialog open={addOpen} onClose={() => setAddOpen(false)} onCreate={startAdd} />
+            <Dialog
+                open={Boolean(toDelete)}
+                title="Delete this section?"
+                onClose={() => setToDelete(null)}
+                actions={
+                    <>
+                        <button type="button" className="btn outlined" onClick={() => setToDelete(null)}>
+                            Cancel
+                        </button>
+                        <button type="button" className="btn danger" onClick={confirmDelete}>
+                            Delete
+                        </button>
+                    </>
+                }
+            >
+                <p style={{ margin: 0 }}>
+                    “{toDelete?.heading}” and everything in it will be removed from your profile. This cannot be undone.
+                </p>
+            </Dialog>
             <Toast toast={toast} onClose={closeToast} />
         </Page>
     )
