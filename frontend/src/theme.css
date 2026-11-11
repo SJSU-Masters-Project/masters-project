@@ -1,0 +1,134 @@
+/* Design tokens from PLATFORM_UI_HANDOFF.md section 4. Components use these variables only. */
+:root,
+:root[data-theme='light'] {
+    --color-primary: #0055a2;
+    --color-primary-hover: #0076d1;
+    --color-accent: #f7c82f;
+    --color-bg: #f7f7f7;
+    --color-surface-1: #ffffff;
+    --color-surface-2: #f2f4f8;
+    --color-surface-3: #e9edf3;
+    --color-text: #1a1f2b;
+    --color-text-muted: #4b5565;
+    --color-border: #d8dee8;
+    --color-error: #c62828;
+    --color-input-bg: #ffffff;
+    --color-success-bg: #ddffdd;
+    --color-danger-bg: #ffdddd;
+    --bg-sidebar: #0055a2;
+    --shadow-popover: 0 10px 30px rgba(15, 23, 42, 0.18);
+    color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+    --color-primary: #2b7acb;
+    --color-primary-hover: #3a8fe0;
+    --color-accent: #f2b544;
+    --color-bg: #0f141b;
+    --color-surface-1: #151b23;
+    --color-surface-2: #1b2430;
+    --color-surface-3: #222c3a;
+    --color-text: #f1f5fa;
+    --color-text-muted: #c2cad6;
+    --color-border: #2a3441;
+    --color-error: #e57373;
+    --color-input-bg: #101821;
+    --color-success-bg: #143225;
+    --color-danger-bg: #3a1414;
+    --bg-sidebar: #0055a2;
+    --shadow-popover: 0 10px 30px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    background: var(--color-bg, #f7f7f7);
+    color: var(--color-text, #1a1f2b);
+}
+
+a {
+    color: var(--color-primary, #0055a2);
+}
+
+/* Global buttons (handoff 10.1): 38px, 8px radius, not uppercase, weight 600. */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 38px;
+    padding: 0 1rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+.btn:disabled,
+.btn[aria-disabled='true'] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.btn.contained {
+    background: var(--color-primary, #0055a2);
+    color: #ffffff;
+}
+.btn.contained:hover:not(:disabled) {
+    background: var(--color-primary-hover, #0076d1);
+}
+.btn.outlined {
+    background: transparent;
+    color: var(--color-primary, #0055a2);
+    border-color: var(--color-primary, #0055a2);
+}
+.btn.outlined:hover:not(:disabled) {
+    background: rgba(0, 85, 162, 0.08);
+}
+.btn.danger {
+    background: transparent;
+    color: var(--color-error, #c62828);
+    border-color: var(--color-error, #c62828);
+}
+.btn.danger:hover:not(:disabled) {
+    background: var(--color-danger-bg, #ffdddd);
+}
+.btn.small {
+    height: 32px;
+    padding: 0 0.75rem;
+}
+
+.btn:focus-visible,
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--color-primary, #0055a2);
+    outline-offset: 2px;
+}
+
+.spin {
+    animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,120 @@
+.filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px 180px;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.searchWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: var(--color-text-muted, #64748b);
+}
+.searchWrap svg {
+    position: absolute;
+    left: 0.75rem;
+    pointer-events: none;
+}
+.search {
+    width: 100%;
+    height: 40px;
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0 0.75rem 0 2.2rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border, #cbd5e1);
+    background: var(--color-surface-2, #f8fafc);
+    color: var(--color-text, #0f172a);
+}
+.search:hover {
+    border-color: var(--color-primary, #0055a2);
+}
+.search:focus {
+    outline: none;
+    border-color: var(--color-primary, #0055a2);
+    box-shadow: 0 0 0 3px rgba(0, 85, 162, 0.12);
+}
+.jobTitle {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+    color: var(--color-text, #0f172a);
+}
+.company {
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+    color: var(--color-primary, #0055a2);
+    font-size: 0.9rem;
+}
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0 0 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #64748b);
+}
+.pills,
+.skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.skills {
+    margin-top: 0.75rem;
+}
+.skill,
+.skillReq {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-border, #e2e8f0);
+    color: var(--color-text-muted, #64748b);
+}
+.skillReq {
+    color: var(--color-text, #0f172a);
+    font-weight: 600;
+    background: var(--color-surface-2, #f2f4f8);
+}
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+.pager span {
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+    .filters {
+        grid-template-columns: 1fr 1fr;
+    }
+    .searchWrap {
+        grid-column: 1 / -1;
+    }
+}
+.back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-primary, #0055a2);
+}
+.detailTitle {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.25rem;
+    color: var(--color-text, #0f172a);
+}
+.description {
+    white-space: pre-wrap;
+    line-height: 1.7;
+    margin: 0 0 1rem;
+    color: var(--color-text, #0f172a);
+}

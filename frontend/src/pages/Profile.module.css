@@ -1,0 +1,19 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 820px;
+}
+.inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+.inline input {
+    accent-color: var(--color-primary, #0055a2);
+}
+.footer {
+    display: flex;
+    justify-content: flex-end;
+}

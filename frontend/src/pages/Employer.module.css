@@ -1,0 +1,98 @@
+.companyForm {
+    max-width: 720px;
+}
+.company {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+.companyName {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+.companyDesc {
+    margin: 0.5rem 0;
+    max-width: 700px;
+    white-space: pre-wrap;
+    color: var(--color-text-muted, #4b5565);
+}
+.site {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.jobsHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.jobList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.jobRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.jobInfo {
+    min-width: 200px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+.jobTitleLine {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+.jobLink {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+    text-decoration: none;
+}
+.jobLink:hover {
+    color: var(--color-primary, #0055a2);
+}
+.jobActions {
+    display: flex;
+    gap: 0.5rem;
+}
+.formActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+.skillRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.reqToggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+.reqToggle input {
+    accent-color: var(--color-primary, #0055a2);
+}

@@ -1,34 +1,4 @@
 /* Login page. Tokens and sizes follow PLATFORM_UI_HANDOFF.md sections 4 to 6. */
-:root {
-    --color-primary: #0055a2;
-    --color-primary-hover: #0076d1;
-    --color-bg: #f7f7f7;
-    --color-surface-1: #ffffff;
-    --color-surface-2: #f2f4f8;
-    --color-text: #1a1f2b;
-    --color-text-muted: #4b5565;
-    --color-border: #d8dee8;
-    --color-error: #c62828;
-    --color-danger-bg: #ffdddd;
-    --color-input-bg: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) {
-        --color-primary: #2b7acb;
-        --color-primary-hover: #3a8fe0;
-        --color-bg: #0f141b;
-        --color-surface-1: #151b23;
-        --color-surface-2: #1b2430;
-        --color-text: #f1f5fa;
-        --color-text-muted: #c2cad6;
-        --color-border: #2a3441;
-        --color-error: #e57373;
-        --color-danger-bg: #3a1414;
-        --color-input-bg: #101821;
-    }
-}
-
 .login-page {
     min-height: 100vh;
     display: grid;
@@ -97,7 +67,9 @@
     border-radius: 8px;
     background: var(--color-surface-2, #f8fafc);
     color: var(--color-text-muted, #64748b);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 .login-input-wrap:hover {
     border-color: var(--color-primary, #0055a2);

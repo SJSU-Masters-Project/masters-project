@@ -1,0 +1,208 @@
+/* App shell: handoff sections 3 and 6. 90px sidebar, 70px header, bottom bar under 768px. */
+.shell {
+    min-height: 100vh;
+    display: flex;
+    background: var(--color-bg, #f7f7f7);
+}
+.shell-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 90px;
+    flex: none;
+    background: var(--bg-sidebar, #0055a2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 0;
+    z-index: 20;
+}
+.shell-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    text-decoration: none;
+}
+.shell-nav {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.shell-item {
+    position: relative;
+    min-height: 68px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+.shell-item:hover,
+.shell-item.active {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+.shell-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: #ffffff;
+}
+.shell-item:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: -2px;
+}
+
+.shell-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+.shell-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 max(1.2rem, 3vw);
+    background: var(--color-surface-1, #ffffff);
+    border-bottom: 1px solid var(--color-border, #d8dee8);
+}
+.shell-wordmark {
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: #0055a2;
+    text-decoration: none;
+    line-height: 1;
+}
+:root[data-theme='dark'] .shell-wordmark {
+    color: var(--color-text, #f1f5fa);
+}
+.shell-wordmark em {
+    font-style: italic;
+}
+.shell-spacer {
+    flex: 1;
+}
+.shell-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 32px;
+    padding: 0 0.75rem;
+    border-radius: 9999px;
+    background: rgba(0, 85, 162, 0.08);
+    color: var(--color-primary, #0055a2);
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.shell-user {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #4b5565);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.shell-icon-btn {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    border: 1px solid var(--color-border, #d8dee8);
+    background: transparent;
+    color: var(--color-text, #1a1f2b);
+    cursor: pointer;
+}
+.shell-icon-btn:hover {
+    background: var(--color-surface-2, #f2f4f8);
+}
+.shell-content {
+    flex: 1;
+}
+.shell-footer {
+    padding: 1.25rem max(1.2rem, 3vw);
+    border-top: 1px solid var(--color-border, #d8dee8);
+    color: var(--color-text-muted, #4b5565);
+    font-size: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.shell-bottom {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .shell-sidebar {
+        display: none;
+    }
+    .shell-header {
+        height: 60px;
+        padding: 0 1rem;
+    }
+    .shell-wordmark {
+        font-size: 1.6rem;
+    }
+    .shell-date,
+    .shell-user {
+        display: none;
+    }
+    .shell-content {
+        padding-bottom: 60px;
+    }
+    .shell-footer {
+        padding-bottom: 76px;
+    }
+    .shell-bottom {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 60px;
+        z-index: 20;
+        display: flex;
+        background: var(--bg-sidebar, #0055a2);
+    }
+    .shell-bottom .shell-item {
+        flex: 1;
+        min-height: 0;
+        gap: 0.15rem;
+        font-size: 0.65rem;
+    }
+    .shell-bottom .shell-item.active::before {
+        left: 20%;
+        right: 20%;
+        top: 0;
+        bottom: auto;
+        width: auto;
+        height: 3px;
+        border-radius: 0 0 3px 3px;
+    }
+}
