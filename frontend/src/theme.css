@@ -15,6 +15,10 @@
     --color-input-bg: #ffffff;
     --color-success-bg: #ddffdd;
     --color-danger-bg: #ffdddd;
+    /* Text on the success/warning tint backgrounds. Separate from the backgrounds so each theme
+       can keep ~4.5:1 contrast (success text on #ddffdd; warning text on the amber tint). */
+    --color-success-text: #1b5e20;
+    --color-warning-text: #92400e;
     --bg-sidebar: #0055a2;
     --shadow-popover: 0 10px 30px rgba(15, 23, 42, 0.18);
     color-scheme: light;
@@ -35,6 +39,9 @@
     --color-input-bg: #101821;
     --color-success-bg: #143225;
     --color-danger-bg: #3a1414;
+    /* Light text for the dark success/warning tints: ~7:1 on #143225 and on the amber tint over #151b23. */
+    --color-success-text: #7ee2a8;
+    --color-warning-text: #fbbf6b;
     --bg-sidebar: #0055a2;
     --shadow-popover: 0 10px 30px rgba(0, 0, 0, 0.5);
     color-scheme: dark;

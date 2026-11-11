@@ -247,7 +247,7 @@
     font-weight: 700;
     white-space: nowrap;
     background: var(--color-success-bg, #ddffdd);
-    color: #2e7d32;
+    color: var(--color-success-text, #1b5e20);
 }
 .scoreNone {
     background: var(--color-surface-2, #f2f4f8);
@@ -269,11 +269,11 @@
 }
 .chipMatch {
     background: var(--color-success-bg, #ddffdd);
-    color: #2e7d32;
+    color: var(--color-success-text, #1b5e20);
 }
 .chipGrowth {
     background: rgba(245, 124, 0, 0.14);
-    color: #b45309;
+    color: var(--color-warning-text, #92400e);
 }
 .jobBottom {
     display: flex;
@@ -393,7 +393,7 @@
     gap: 0.35rem;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #2e7d32;
+    color: var(--color-success-text, #1b5e20);
 }
 .step {
     display: flex;
