@@ -1,0 +1,299 @@
+/* Read-only views for the profile section templates. Colours come from the theme tokens. */
+.sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+.muted {
+    color: var(--color-text-muted, #64748b);
+}
+.text {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--color-text, #0f172a);
+    overflow-wrap: anywhere;
+}
+.extLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 8px;
+    color: var(--color-primary, #0055a2);
+    border: 1px solid var(--color-border, #d8dee8);
+    background: transparent;
+}
+.extLink:hover {
+    background: rgba(0, 85, 162, 0.08);
+    border-color: rgba(0, 85, 162, 0.25);
+}
+.textLink {
+    color: var(--color-primary, #0055a2);
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+.textLink:hover {
+    text-decoration: underline;
+}
+.textLink:focus-visible,
+.extLink:focus-visible {
+    outline: 2px solid var(--color-primary, #0055a2);
+    outline-offset: 2px;
+}
+
+/* Cards */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 1.25rem;
+}
+.item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-width: 0;
+    padding: 1.1rem;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 12px;
+    background: var(--color-surface-1, #ffffff);
+}
+.itemHead {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.itemTitle {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+    overflow-wrap: anywhere;
+}
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.tag {
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(0, 85, 162, 0.1);
+    color: var(--color-primary, #0055a2);
+}
+.bullets {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-text, #0f172a);
+}
+
+/* Timeline (also education) */
+.timeline {
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 1.5rem;
+    list-style: none;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: var(--color-border, #d8dee8);
+}
+.entry {
+    position: relative;
+    padding-bottom: 1.25rem;
+}
+.entry:last-child {
+    padding-bottom: 0;
+}
+.entry::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.4rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-primary, #0055a2);
+    border: 2px solid var(--color-surface-1, #ffffff);
+}
+.entryTitle {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+    overflow-wrap: anywhere;
+}
+.entrySub {
+    margin: 0.1rem 0 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text, #0f172a);
+}
+.entryMeta {
+    margin: 0.15rem 0 0;
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #64748b);
+}
+.entryText {
+    margin: 0.4rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+/* List */
+.rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 12px;
+    background: var(--color-surface-1, #ffffff);
+}
+.row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+.row:last-child {
+    border-bottom: 0;
+}
+.rowMain {
+    min-width: 0;
+}
+
+/* Chips */
+.groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 1.25rem;
+}
+.group {
+    padding: 1.1rem;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 12px;
+    background: var(--color-surface-1, #ffffff);
+}
+.groupTitle {
+    margin: 0 0 0.7rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+}
+.skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.skill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: var(--color-surface-2, #f2f4f8);
+    border: 1px solid var(--color-border, #d8dee8);
+    color: var(--color-text, #0f172a);
+}
+.dots {
+    display: inline-flex;
+    gap: 3px;
+}
+.dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-border, #d8dee8);
+}
+.dotOn {
+    background: var(--color-primary, #0055a2);
+}
+
+/* Links */
+.linkGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 1rem;
+}
+.linkCard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 12px;
+    background: var(--color-surface-1, #ffffff);
+    transition: all 0.2s ease;
+}
+.linkCard:hover {
+    border-color: rgba(0, 85, 162, 0.4);
+    box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.06);
+}
+.linkCard:focus-visible {
+    outline: 2px solid var(--color-primary, #0055a2);
+    outline-offset: 2px;
+}
+.linkName {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    color: var(--color-primary, #0055a2);
+}
+.linkUrl {
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #64748b);
+    overflow-wrap: anywhere;
+}
+
+/* Rich text */
+.rich {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--color-text, #0f172a);
+    overflow-wrap: anywhere;
+}
+.rich > :first-child {
+    margin-top: 0;
+}
+.rich > :last-child {
+    margin-bottom: 0;
+}
+.rich a {
+    color: var(--color-primary, #0055a2);
+    font-weight: 600;
+}
