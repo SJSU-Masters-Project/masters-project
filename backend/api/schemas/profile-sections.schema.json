@@ -1,0 +1,184 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://myacademic.org/schemas/profile-sections.schema.json",
+    "title": "Profile sections",
+    "description": "Prof. Dhar's profile section templates: the `sections` array (custom sections) and the `education` section. Not part of shared-user-profile.v1; a future v2 contract would take these keys from this file.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "sections": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/section" }
+        },
+        "education": { "$ref": "#/$defs/education" }
+    },
+    "$defs": {
+        "requiredText": {
+            "description": "A required string: present and not only whitespace.",
+            "type": "string",
+            "pattern": "\\S"
+        },
+        "optionalText": {
+            "description": "An optional string: may be absent or empty.",
+            "type": "string"
+        },
+        "optionalLink": {
+            "description": "An optional external link: empty, or an http(s) URL.",
+            "type": "string",
+            "anyOf": [{ "maxLength": 0 }, { "format": "uri", "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://" }]
+        },
+        "requiredUrl": {
+            "description": "A required external URL: http(s) only.",
+            "type": "string",
+            "format": "uri",
+            "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://"
+        },
+        "dateOrNull": {
+            "description": "An ISO-8601 calendar date (YYYY-MM-DD) or null. Never an empty string.",
+            "type": ["string", "null"],
+            "format": "date",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "stringList": {
+            "type": "array",
+            "items": { "type": "string" }
+        },
+        "cardItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title"],
+            "properties": {
+                "title": { "$ref": "#/$defs/requiredText" },
+                "purpose": { "$ref": "#/$defs/optionalText" },
+                "link": { "$ref": "#/$defs/optionalLink" },
+                "techStack": { "$ref": "#/$defs/stringList" },
+                "features": { "$ref": "#/$defs/stringList" }
+            }
+        },
+        "timelineItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "subtitle", "startDate", "endDate"],
+            "properties": {
+                "title": { "$ref": "#/$defs/requiredText" },
+                "subtitle": { "$ref": "#/$defs/requiredText" },
+                "link": { "$ref": "#/$defs/optionalLink" },
+                "description": { "$ref": "#/$defs/optionalText" },
+                "startDate": { "$ref": "#/$defs/dateOrNull" },
+                "endDate": { "$ref": "#/$defs/dateOrNull" }
+            }
+        },
+        "educationItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["degree", "institute", "startDate", "endDate"],
+            "properties": {
+                "degree": { "$ref": "#/$defs/requiredText" },
+                "institute": { "$ref": "#/$defs/requiredText" },
+                "grade": { "$ref": "#/$defs/optionalText" },
+                "link": { "$ref": "#/$defs/optionalLink" },
+                "startDate": { "$ref": "#/$defs/dateOrNull" },
+                "endDate": { "$ref": "#/$defs/dateOrNull" }
+            }
+        },
+        "listItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "date"],
+            "properties": {
+                "title": { "$ref": "#/$defs/requiredText" },
+                "subtitle": { "$ref": "#/$defs/optionalText" },
+                "link": { "$ref": "#/$defs/optionalLink" },
+                "date": { "$ref": "#/$defs/dateOrNull" },
+                "description": { "$ref": "#/$defs/optionalText" }
+            }
+        },
+        "chipSkill": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["skillName", "proficiency"],
+            "properties": {
+                "skillName": { "$ref": "#/$defs/requiredText" },
+                "proficiency": { "type": "integer", "minimum": 1, "maximum": 5 }
+            }
+        },
+        "chipsItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["category", "skillsList"],
+            "properties": {
+                "category": { "$ref": "#/$defs/requiredText" },
+                "skillsList": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": { "$ref": "#/$defs/chipSkill" }
+                }
+            }
+        },
+        "linkItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "url"],
+            "properties": {
+                "name": { "$ref": "#/$defs/requiredText" },
+                "url": { "$ref": "#/$defs/requiredUrl" },
+                "description": { "$ref": "#/$defs/optionalText" }
+            }
+        },
+        "section": {
+            "description": "The common envelope. `template` selects the schema of the items in `data`. Stored keys are exactly these four.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["heading", "visible", "template", "data"],
+            "properties": {
+                "heading": { "$ref": "#/$defs/requiredText" },
+                "visible": { "type": "boolean" },
+                "template": { "enum": ["cards", "timeline", "list", "chips", "links", "text"] },
+                "data": { "type": "array" }
+            },
+            "allOf": [
+                {
+                    "if": { "required": ["template"], "properties": { "template": { "const": "cards" } } },
+                    "then": { "properties": { "data": { "items": { "$ref": "#/$defs/cardItem" } } } }
+                },
+                {
+                    "if": { "required": ["template"], "properties": { "template": { "const": "timeline" } } },
+                    "then": { "properties": { "data": { "items": { "$ref": "#/$defs/timelineItem" } } } }
+                },
+                {
+                    "if": { "required": ["template"], "properties": { "template": { "const": "list" } } },
+                    "then": { "properties": { "data": { "items": { "$ref": "#/$defs/listItem" } } } }
+                },
+                {
+                    "if": { "required": ["template"], "properties": { "template": { "const": "chips" } } },
+                    "then": { "properties": { "data": { "items": { "$ref": "#/$defs/chipsItem" } } } }
+                },
+                {
+                    "if": { "required": ["template"], "properties": { "template": { "const": "links" } } },
+                    "then": { "properties": { "data": { "items": { "$ref": "#/$defs/linkItem" } } } }
+                },
+                {
+                    "if": { "required": ["template"], "properties": { "template": { "const": "text" } } },
+                    "then": {
+                        "properties": { "data": { "minItems": 1, "maxItems": 1, "items": { "type": "string" } } }
+                    }
+                }
+            ]
+        },
+        "education": {
+            "description": "The top-level education section: one envelope that always uses the timeline template.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["heading", "visible", "template", "data"],
+            "properties": {
+                "heading": { "const": "Education" },
+                "visible": { "type": "boolean" },
+                "template": { "const": "timeline" },
+                "data": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/educationItem" }
+                }
+            }
+        }
+    }
+}
