@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { SignOutButton } from '@clerk/react'
 import { AlertCircle, ArrowRight, Loader2 } from 'lucide-react'
-import { useApi } from './api'
 import './login.css'
 
 const ROLES = [
@@ -9,35 +8,7 @@ const ROLES = [
     { value: 'employer', label: 'Employer' },
 ]
 
-// Wraps the portal for signed-in users. The API creates a Clerk user with no role on their first
-// request; they choose candidate or employer once (POST /api/v1/me/role) before going further.
-// The portal stays on screen while /api/v1/me loads, so returning users see no flash.
-export default function RoleGate({ children }) {
-    const api = useApi()
-    const [me, setMe] = useState(null)
-    const [error, setError] = useState(null)
-
-    const load = () => {
-        setError(null)
-        api('/v1/me').then(setMe, (err) => setError(err.message))
-    }
-    useEffect(load, [])
-
-    const choose = async (role) => {
-        try {
-            setMe(await api('/v1/me/role', { method: 'POST', body: JSON.stringify({ role }) }))
-        } catch (err) {
-            if (err.status === 409) return load() // already chosen, e.g. in another tab
-            throw err
-        }
-    }
-
-    if (error) return <AccountError message={error} onRetry={load} />
-    if (me && !me.role) return <RoleChoice onChoose={choose} />
-    return children
-}
-
-function RoleChoice({ onChoose }) {
+export function RoleChoice({ onChoose }) {
     const [role, setRole] = useState('candidate')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
@@ -120,7 +91,7 @@ function RoleChoice({ onChoose }) {
 
 // Shown when the API rejects a signed-in user (e.g. the Clerk instance is missing the "email"
 // session-token claim) or cannot be reached, so the user is never stuck on a blank page.
-function AccountError({ message, onRetry }) {
+export function AccountError({ message, onRetry }) {
     return (
         <div className="login-page">
             <main className="login-card" aria-labelledby="account-error-title">

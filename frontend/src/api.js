@@ -1,37 +1,74 @@
-import { useAuth } from '@clerk/react'
-import { useCallback } from 'react'
+let tokenProvider = async () => null
+
+export function setTokenProvider(provider) {
+    tokenProvider = provider
+}
 
 export class ApiError extends Error {
-    constructor(message, status) {
+    constructor(message, status, code, details) {
         super(message)
-        this.status = status // 0 when the server could not be reached
+        this.status = status
+        this.code = code
+        this.details = details || {}
     }
 }
 
-// Calls the careers API under /api: the same origin in production (nginx proxies it), and
-// Vite's dev-server proxy locally. Clerk session tokens are short-lived, so a token is fetched
-// for every request; Clerk caches it and refreshes it when it is about to expire.
-export function useApi() {
-    const { getToken } = useAuth()
-    return useCallback(
-        async (path, options = {}) => {
-            const token = await getToken()
-            const headers = { ...options.headers }
-            if (token) headers.Authorization = `Bearer ${token}`
-            if (typeof options.body === 'string') headers['Content-Type'] = 'application/json'
-
-            let res
-            try {
-                res = await fetch(`/api${path}`, { ...options, headers })
-            } catch {
-                throw new ApiError('Unable to reach the server. Please try again.', 0)
-            }
-            const body = await res.json().catch(() => null)
-            if (!res.ok) {
-                throw new ApiError(body?.error?.message || `Request failed (${res.status}).`, res.status)
-            }
-            return body
-        },
-        [getToken]
-    )
+const query = (params) => {
+    const qs = new URLSearchParams()
+    Object.entries(params || {}).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') qs.set(k, v)
+    })
+    const s = qs.toString()
+    return s ? `?${s}` : ''
 }
+
+async function request(path, { method = 'GET', body, form, params } = {}) {
+    const token = await tokenProvider()
+    const headers = {}
+    if (token) headers.Authorization = `Bearer ${token}`
+    let payload
+    if (form) {
+        payload = form
+    } else if (body !== undefined) {
+        headers['Content-Type'] = 'application/json'
+        payload = JSON.stringify(body)
+    }
+
+    let res
+    try {
+        res = await fetch(`/api/v1${path}${query(params)}`, { method, headers, body: payload })
+    } catch {
+        throw new ApiError('Unable to reach the server. Please try again.', 0, 'network')
+    }
+
+    if (res.ok) return res
+
+    let err = { message: res.status >= 500 ? 'The server is unavailable. Please try again.' : 'Request failed.' }
+    try {
+        err = (await res.json())?.error || err
+    } catch {
+        // non-JSON error body
+    }
+    throw new ApiError(err.message, res.status, err.code, err.details)
+}
+
+export async function api(path, options) {
+    const res = await request(path, options)
+    return res.status === 204 ? null : res.json()
+}
+
+// Downloads a file through the authenticated API and hands it to the browser.
+export async function downloadFile(path, filename) {
+    const res = await request(path)
+    const url = URL.createObjectURL(await res.blob())
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+}
+
+// True when the failure is one the user can fix by trying again.
+export const isRetryable = (err) => !(err instanceof ApiError) || err.status === 0 || err.status >= 500
