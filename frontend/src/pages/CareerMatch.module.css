@@ -1,0 +1,461 @@
+/* CareerMatch page. Structure follows ../career_match_mockup.html; all colours are theme tokens
+   (handoff: no raw indigo, no gradient hero, no 230px sidebar — the app Shell supplies navigation). */
+
+.updateBtn {
+    white-space: nowrap;
+}
+
+/* Hero: a flat card, not the template's gradient. No decorative orb. */
+.hero {
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 16px;
+    background: var(--color-surface-1, #ffffff);
+}
+.eyebrow {
+    margin: 0 0 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: var(--color-primary, #0055a2);
+}
+.heroTitle {
+    margin: 0 0 0.5rem;
+    font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text, #0f172a);
+    max-width: 640px;
+}
+.heroText {
+    margin: 0 0 1rem;
+    color: var(--color-text-muted, #64748b);
+    max-width: 620px;
+    line-height: 1.6;
+}
+
+/* Stat tiles */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.stat {
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 16px;
+    background: var(--color-surface-1, #ffffff);
+}
+.statLabel {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #64748b);
+}
+.statValue {
+    display: block;
+    margin: 0.15rem 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text, #0f172a);
+}
+.statCaption {
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #64748b);
+}
+
+/* Two-column layout: matches on the left, profile and assistant on the right */
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 1.25rem;
+    align-items: start;
+}
+.panel {
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 16px;
+    background: var(--color-surface-1, #ffffff);
+}
+.panelHead {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.panelTitle {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+}
+.panelSub {
+    margin: 0.2rem 0 0;
+    font-size: 0.82rem;
+    color: var(--color-text-muted, #64748b);
+}
+.linkBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 0;
+    background: none;
+    padding: 0;
+    color: var(--color-primary, #0055a2);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.linkBtn:hover {
+    text-decoration: underline;
+}
+.linkBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.linkBtn:focus-visible {
+    outline: 2px solid var(--color-primary, #0055a2);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--color-border, #e2e8f0);
+    margin-bottom: 1.1rem;
+}
+.tab {
+    border: 0;
+    background: none;
+    padding: 0 0 0.7rem;
+    margin-bottom: -1px;
+    color: var(--color-text-muted, #64748b);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+.tabActive {
+    color: var(--color-primary, #0055a2);
+    border-bottom-color: var(--color-primary, #0055a2);
+}
+.tab:focus-visible {
+    outline: 2px solid var(--color-primary, #0055a2);
+    outline-offset: 2px;
+}
+
+/* Filters */
+.filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px 160px;
+    gap: 0.6rem;
+    margin-bottom: 1.1rem;
+}
+.searchWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: var(--color-text-muted, #64748b);
+}
+.searchWrap svg {
+    position: absolute;
+    left: 0.7rem;
+    pointer-events: none;
+}
+.search {
+    width: 100%;
+    height: 40px;
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0 0.75rem 0 2.1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border, #cbd5e1);
+    background: var(--color-surface-2, #f8fafc);
+    color: var(--color-text, #0f172a);
+}
+.search:focus,
+.select:focus {
+    outline: none;
+    border-color: var(--color-primary, #0055a2);
+    box-shadow: 0 0 0 3px rgba(0, 85, 162, 0.12);
+}
+.select {
+    height: 40px;
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0 0.6rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border, #cbd5e1);
+    background: var(--color-surface-2, #f8fafc);
+    color: var(--color-text, #0f172a);
+}
+
+/* Job card */
+.job {
+    padding: 1.1rem;
+    margin-bottom: 0.9rem;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: 14px;
+    background: var(--color-surface-1, #ffffff);
+}
+.jobTop {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.9rem;
+}
+.company {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+.logo {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 43px;
+    flex: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    background: rgba(0, 85, 162, 0.1);
+    color: var(--color-primary, #0055a2);
+}
+.role {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+}
+.jobMeta {
+    margin: 0.15rem 0 0;
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #64748b);
+}
+.score {
+    flex: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    background: var(--color-success-bg, #ddffdd);
+    color: var(--color-success-text, #1b5e20);
+}
+.scoreNone {
+    background: var(--color-surface-2, #f2f4f8);
+    color: var(--color-text-muted, #4b5565);
+}
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.9rem 0;
+}
+.chip {
+    padding: 0.25rem 0.55rem;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: var(--color-surface-2, #f2f4f8);
+    color: var(--color-text-muted, #4b5565);
+}
+.chipMatch {
+    background: var(--color-success-bg, #ddffdd);
+    color: var(--color-success-text, #1b5e20);
+}
+.chipGrowth {
+    background: rgba(245, 124, 0, 0.14);
+    color: var(--color-warning-text, #92400e);
+}
+.jobBottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--color-border, #e2e8f0);
+}
+.why {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #64748b);
+    max-width: 440px;
+}
+.jobActions {
+    display: flex;
+    gap: 0.5rem;
+    flex: none;
+}
+
+/* Right column: profile */
+.profileTop {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.avatar {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border-radius: 50%;
+    font-weight: 800;
+    background: rgba(0, 85, 162, 0.1);
+    color: var(--color-primary, #0055a2);
+}
+.name {
+    margin: 0;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+}
+.barRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #64748b);
+}
+.barBg {
+    height: 8px;
+    margin: 0.5rem 0 1rem;
+    border-radius: 8px;
+    background: var(--color-surface-2, #f2f4f8);
+    overflow: hidden;
+}
+.barFill {
+    height: 100%;
+    border-radius: 8px;
+    background: var(--color-primary, #0055a2);
+    transition: width 0.3s ease;
+}
+.sectionLabel {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+}
+.skillChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.upload {
+    margin-top: 1rem;
+    padding: 1.1rem;
+    text-align: center;
+    border: 1px dashed var(--color-border, #aeb9e5);
+    border-radius: 12px;
+    background: var(--color-surface-2, #f8fafc);
+}
+.uploadIcon {
+    color: var(--color-primary, #0055a2);
+    margin-bottom: 0.3rem;
+}
+.uploadBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 0;
+    background: none;
+    padding: 0;
+    color: var(--color-primary, #0055a2);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.uploadBtn:focus-visible {
+    outline: 2px solid var(--color-primary, #0055a2);
+    outline-offset: 2px;
+}
+.uploadHint {
+    margin: 0.35rem 0 0;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #64748b);
+}
+
+/* Assistant steps */
+.advisory {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-success-text, #1b5e20);
+}
+.step {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0.9rem 0;
+}
+.stepNo {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: rgba(0, 85, 162, 0.1);
+    color: var(--color-primary, #0055a2);
+}
+.stepTitle {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text, #0f172a);
+}
+.stepText {
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #64748b);
+}
+.footnote {
+    margin: 0.5rem 0 0;
+    font-size: 0.72rem;
+    color: var(--color-text-muted, #64748b);
+}
+.empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--color-text-muted, #64748b);
+}
+.dialogList {
+    margin: 0.5rem 0 0;
+    padding-left: 1.2rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 1000px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 560px) {
+    .filters {
+        grid-template-columns: 1fr;
+    }
+    .jobTop,
+    .jobBottom {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .jobActions {
+        width: 100%;
+    }
+}
